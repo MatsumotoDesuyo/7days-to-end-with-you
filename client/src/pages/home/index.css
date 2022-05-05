@@ -1,0 +1,8 @@
+@font-face {
+  font-family: '7dtewy';
+  src: url('/public/fonts/7days_to_end_with_you-Regular.ttf');
+}
+
+.dtwey-font {
+  font-family: '7dtewy' !important;
+}
