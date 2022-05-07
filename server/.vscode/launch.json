@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Express",
+      "type": "pwa-node",
+      "request": "launch",
+      // "protocol":"inspector",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node-dev",
+      "args": ["${workspaceRoot}/src/index.ts"],
+      // "serverReadyAction":{
+      //     "action": "openExternally",
+      //     "pattern": "Start on port ([0-9]+)",
+      //     "uriFormat": "http://localhost:%s",
+      // },
+      "cwd": "${workspaceFolder}",
+      "restart": true,
+      "outputCapture": "std"
+    }
+  ]
+}

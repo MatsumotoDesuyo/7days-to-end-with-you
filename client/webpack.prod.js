@@ -3,14 +3,9 @@ const common = require('./webpack.common');
 
 module.exports = merge(common, {
   mode: 'production',
-  entry: './src/exports.ts',
+  entry: './src/index.tsx',
   output: {
-    filename: 'exports.js',
-  },
-  externals: {
-    react: 'react',
-    'react-dom': 'react-dom',
-    'react-router-dom': 'react-router-dom',
+    filename: 'index.js',
   },
   performance: {
     hints: 'warning',

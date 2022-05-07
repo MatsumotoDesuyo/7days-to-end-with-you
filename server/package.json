@@ -1,0 +1,55 @@
+{
+  "name": "7days-to-end-with-you-server",
+  "version": "0.1.10",
+  "description": "7days to end with you解読補助ツール",
+  "author": "MatsumotoDesuyo",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MatsumotoDesuyo/7days-to-end-with-you.git"
+  },
+  "main": "dist/exports.js",
+  "types": "dist/exports.d.ts",
+  "files": [
+    "package-lock.json",
+    "/src",
+    "!/src/*.test.ts",
+    "!/src/*.test.tsx",
+    "!/src/__snapshots__",
+    "/dist"
+  ],
+  "scripts": {
+    "start": "ts-node-dev src/index.ts",
+    "test": "jest",
+    "lint": "eslint .",
+    "clean": "rimraf dist/*",
+    "build": "npm run clean && tsc"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "log4js": "^6.3.0",
+    "mysql2": "^2.2.5",
+    "mysql2-promise": "^0.1.4"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.19",
+    "@types/express": "^4.17.13",
+    "@types/jest": "^26.0.24",
+    "@types/log4js": "^2.3.5",
+    "@types/mysql2": "github:types/mysql2",
+    "@types/node": "^16.3.2",
+    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/parser": "^4.28.4",
+    "eslint": "^7.31.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^3.4.0",
+    "jest": "^27.0.6",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.0.4",
+    "ts-node": "^10.1.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.3.5"
+  }
+}

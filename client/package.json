@@ -8,8 +8,8 @@
     "type": "git",
     "url": "https://github.com/MatsumotoDesuyo/7days-to-end-with-you.git"
   },
-  "main": "./dist/exports.js",
-  "types": "./dist/exports.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "package-lock.json",
     "/src",
