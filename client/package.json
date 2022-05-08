@@ -28,7 +28,7 @@
     "postbuild": "npm run copy",
     "prepublishOnly": "npm run build",
     "test": "jest",
-    "copy": "rimraf ../server/public/js && cpx -C \"dist/*.{js,ttf}\" ../server/public/js"
+    "copy": "rimraf ../server/public && cpx -C \"public/*\" ../server/public && cpx -C \"public/images/*\" ../server/public/images && cpx -C \"dist/*.{js,ttf}\" ../server/public/js"
   },
   "dependencies": {
     "@emotion/react": "^11.4.1",
