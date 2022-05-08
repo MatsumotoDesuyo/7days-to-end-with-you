@@ -117,6 +117,7 @@ export default class Home extends React.Component<{}, HomeState> {
             </Grid>
           </Grid>
           <TextField
+            type="url"
             value={upperText}
             InputProps={{
               className: 'dtwey-font',
