@@ -26,10 +26,12 @@
     "build": "npm run clean && tsc"
   },
   "dependencies": {
+    "@types/sqlite3": "^3.1.8",
     "express": "^4.17.1",
     "log4js": "^6.3.0",
     "mysql2": "^2.2.5",
-    "mysql2-promise": "^0.1.4"
+    "mysql2-promise": "^0.1.4",
+    "sqlite3": "^5.0.8"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.19",
