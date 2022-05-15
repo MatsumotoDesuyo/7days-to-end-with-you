@@ -15,11 +15,17 @@ import {
 } from '@mui/material';
 import './index.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import axios from 'axios';
 import AnalyseSentense from '../../common/analyse-sentense';
 
 type HomeState = {
   upperText: string;
   analyseTexts: string[];
+  wordMeans: WordMean[];
+};
+type WordMean = {
+  word: string;
+  mean: string;
 };
 
 const alphabets: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -31,6 +37,7 @@ export default class Home extends React.Component<{}, HomeState> {
     this.state = {
       upperText: '',
       analyseTexts: [],
+      wordMeans: [],
     };
   }
 
@@ -56,13 +63,26 @@ export default class Home extends React.Component<{}, HomeState> {
       this.setState(() => ({
         upperText: upperStr,
         analyseTexts,
+        wordMeans: [],
       }));
     }
+  };
+
+  searchWord = async () => {
+    const { upperText } = this.state;
+    const { data } = await axios.get('/api/search-word', {
+      params: { word: upperText },
+    });
+    if (data.length === 0) return;
+    this.setState(() => ({
+      wordMeans: data,
+    }));
   };
 
   render() {
     const { analyseTexts } = this.state;
     const { upperText } = this.state;
+    const { wordMeans } = this.state;
     return (
       <Stack justifyContent="center" alignItems="center">
         <Stack maxWidth="md" justifyContent="center" spacing={2}>
@@ -116,19 +136,56 @@ export default class Home extends React.Component<{}, HomeState> {
               </Button>
             </Grid>
           </Grid>
-          <TextField
-            type="email"
-            inputMode="email"
-            value={upperText}
-            InputProps={{
-              className: 'dtwey-font',
-              style: { fontSize: '30px' },
-            }}
-            label="ここに単語を入力"
-            onChange={(event) => {
-              this.onChangeTextFieldHandle(event);
-            }}
-          />
+          <Grid container justifyContent="space-around">
+            <Grid item xs={8.5} md={9.5}>
+              <TextField
+                type="email"
+                inputMode="email"
+                value={upperText}
+                InputProps={{
+                  className: 'dtwey-font',
+                  style: { fontSize: '30px' },
+                }}
+                label="ここに単語を入力"
+                onChange={(event) => {
+                  this.onChangeTextFieldHandle(event);
+                }}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={3} md={2}>
+              <Button
+                variant="contained"
+                style={{ height: '100%' }}
+                fullWidth
+                onClick={() => {
+                  this.searchWord();
+                }}
+              >
+                辞書検索
+              </Button>
+            </Grid>
+          </Grid>
+          {wordMeans.length !== 0 && (
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>単語</TableCell>
+                    <TableCell>意味</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {wordMeans.map((wm) => (
+                    <TableRow>
+                      <TableCell>{wm.word}</TableCell>
+                      <TableCell>{wm.mean}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
           <TableContainer>
             <Table size="small">
               <TableHead>
