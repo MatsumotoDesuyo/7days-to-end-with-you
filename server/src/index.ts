@@ -18,20 +18,22 @@ app.listen(5001, () => {
   sysLogger.info('Start on port 5001.');
 });
 
-app.get('/api/users', async (req: express.Request, res: express.Response) => {
-  const db = new sqlite3.Database('ejdict.sqlite3');
-  const result: string[] = [];
+const db = new sqlite3.Database('ejdict.sqlite3');
+app.get('/api/search-word', (req: express.Request, res: express.Response) => {
   db.serialize(() => {
+    const searchWord = req.query.word?.toString() ?? '';
+    if (searchWord === '') {
+      res.send();
+      return;
+    }
     //数値を一定ずらして変換
-    const strs = AnalyseSentense('sea');
-    const param: string = '';
+    const strs: string[] = AnalyseSentense(searchWord);
     let questions: string = '';
     for (let i = 0; strs.length > i; i++) {
       strs[i] = `${strs[i].toLocaleLowerCase()}`;
       if (i !== 0) questions += ',';
       questions += '?';
     }
-    console.log(param);
     const stmt = db.prepare(
       `select word,mean from items WHERE word IN(${questions}) limit 100`
     );
@@ -43,8 +45,6 @@ app.get('/api/users', async (req: express.Request, res: express.Response) => {
     });
     // }
   });
-
-  db.close();
 });
 
 app.get('*', (req, res) => {
