@@ -13,7 +13,7 @@ import {
   TableRow,
   TableBody,
 } from '@mui/material';
-import './index.css';
+import './index.scss';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import axios from 'axios';
 import AnalyseSentense from '../../common/analyse-sentense';
@@ -84,128 +84,131 @@ export default class Home extends React.Component<{}, HomeState> {
     const { upperText } = this.state;
     const { wordMeans } = this.state;
     return (
-      <Stack justifyContent="center" alignItems="center">
-        <Stack maxWidth="md" justifyContent="center" spacing={2}>
-          <Typography variant="h5" textAlign="center">
-            7 Days to End with You
-            <br />
-            解読補助ツール
-          </Typography>
-          <Typography textAlign="center">
-            7 Days to End with
-            Youで使用されている、シーザー暗号を解読する簡易ツールです。
-            <br />
-            答えは見たくないけどちょっとヒントが欲しいというときにお使いください。
-          </Typography>
-          <Grid container columnSpacing={0.5} rowSpacing={0.5}>
-            {alphabets.map((c) => (
+      <>
+        <Stack justifyContent="center" alignItems="center">
+          <Stack maxWidth="md" justifyContent="center" spacing={2}>
+            <Typography variant="h5" textAlign="center">
+              7 Days to End with You
+              <br />
+              解読補助ツール
+            </Typography>
+            <Typography textAlign="center">
+              7 Days to End with
+              Youで使用されている、シーザー暗号を解読する簡易ツールです。
+              <br />
+              答えは見たくないけどちょっとヒントが欲しいというときにお使いください。
+            </Typography>
+            <Grid container columnSpacing={0.5} rowSpacing={0.5}>
+              {alphabets.map((c) => (
+                <Grid item xs={4} md={1.3333}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={
+                      <Avatar variant="square" src={`/images/${c}.png`} />
+                    }
+                    onClick={() => {
+                      this.showAnalyzeText(upperText + c.toUpperCase());
+                    }}
+                    style={{ borderRadius: 0 }}
+                  >
+                    {c.toUpperCase()}
+                  </Button>
+                </Grid>
+              ))}
               <Grid item xs={4} md={1.3333}>
                 <Button
                   fullWidth
                   variant="outlined"
-                  startIcon={
-                    <Avatar variant="square" src={`/images/${c}.png`} />
-                  }
                   onClick={() => {
-                    this.showAnalyzeText(upperText + c.toUpperCase());
+                    this.showAnalyzeText(
+                      upperText.substring(0, upperText.length - 1)
+                    );
                   }}
-                  style={{ borderRadius: 0 }}
+                  style={{
+                    borderRadius: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    fontSize: 11.5,
+                  }}
                 >
-                  {c.toUpperCase()}
+                  <BackspaceIcon color="action" fontSize="small" />
+                  BackSpace
                 </Button>
               </Grid>
-            ))}
-            <Grid item xs={4} md={1.3333}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => {
-                  this.showAnalyzeText(
-                    upperText.substring(0, upperText.length - 1)
-                  );
-                }}
-                style={{
-                  borderRadius: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  fontSize: 11.5,
-                }}
-              >
-                <BackspaceIcon color="action" fontSize="small" />
-                BackSpace
-              </Button>
             </Grid>
-          </Grid>
-          <Grid container justifyContent="space-around">
-            <Grid item xs={8.5} md={9.5}>
-              <TextField
-                type="email"
-                inputMode="email"
-                value={upperText}
-                InputProps={{
-                  className: 'dtwey-font',
-                  style: { fontSize: '30px' },
-                }}
-                label="ここに単語を入力"
-                onChange={(event) => {
-                  this.onChangeTextFieldHandle(event);
-                }}
-                fullWidth
-              />
+            <Grid container justifyContent="space-around">
+              <Grid item xs={8.5} md={9.5}>
+                <TextField
+                  type="email"
+                  inputMode="email"
+                  value={upperText}
+                  InputProps={{
+                    className: 'dtwey-font',
+                    style: { fontSize: '30px' },
+                  }}
+                  label="ここに単語を入力"
+                  onChange={(event) => {
+                    this.onChangeTextFieldHandle(event);
+                  }}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={3} md={2}>
+                <Button
+                  variant="contained"
+                  style={{ height: '100%' }}
+                  fullWidth
+                  onClick={() => {
+                    this.searchWord();
+                  }}
+                >
+                  辞書検索
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={3} md={2}>
-              <Button
-                variant="contained"
-                style={{ height: '100%' }}
-                fullWidth
-                onClick={() => {
-                  this.searchWord();
-                }}
-              >
-                辞書検索
-              </Button>
-            </Grid>
-          </Grid>
-          {wordMeans.length !== 0 && (
+            {wordMeans.length !== 0 && (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>単語</TableCell>
+                      <TableCell>意味</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {wordMeans.map((wm) => (
+                      <TableRow>
+                        <TableCell>{wm.word}</TableCell>
+                        <TableCell>{wm.mean}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
             <TableContainer>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>単語</TableCell>
-                    <TableCell>意味</TableCell>
+                    <TableCell>ずらし量</TableCell>
+                    <TableCell>推測文字</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {wordMeans.map((wm) => (
+                  {analyseTexts.map((txt, idx) => (
                     <TableRow>
-                      <TableCell>{wm.word}</TableCell>
-                      <TableCell>{wm.mean}</TableCell>
+                      <TableCell>{idx}</TableCell>
+                      <TableCell>{txt}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
-          )}
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>ずらし量</TableCell>
-                  <TableCell>推測文字</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {analyseTexts.map((txt, idx) => (
-                  <TableRow>
-                    <TableCell>{idx}</TableCell>
-                    <TableCell>{txt}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          </Stack>
         </Stack>
-      </Stack>
+        <div className="footer">©2022 watashihamatsumotodes@gmail.com</div>
+      </>
     );
   }
 }

@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 @font-face {
   font-family: '7dtewy';
   src: url('/public/fonts/7days_to_end_with_you-Regular.ttf');
@@ -5,4 +9,12 @@
 
 .dtwey-font {
   font-family: '7dtewy' !important;
+}
+
+.footer {
+  color: white;
+  background-color: black;
+  text-align: center;
+  font-size: 0.6rem;
+  padding: 0.8rem;
 }
