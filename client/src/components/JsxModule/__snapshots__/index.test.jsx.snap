@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`test test 1`] = `
-<h2>
-  I&#39m JS module.
-</h2>
-`;
