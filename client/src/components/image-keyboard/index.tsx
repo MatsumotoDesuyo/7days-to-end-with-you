@@ -8,6 +8,7 @@ type Props = {
 };
 const alphabets: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
 export default function ImageKeyboard(props: Props) {
+  const { onInputButtonPushedFunc, onDeleteButtonPushedFunc } = props;
   return (
     <Grid container columnSpacing={0.5} rowSpacing={0.5}>
       {alphabets.map((c) => (
@@ -17,7 +18,7 @@ export default function ImageKeyboard(props: Props) {
             variant="outlined"
             startIcon={<Avatar variant="square" src={`/images/${c}.png`} />}
             onClick={() => {
-              props.onInputButtonPushedFunc(c.toUpperCase());
+              onInputButtonPushedFunc(c.toUpperCase());
             }}
             style={{ borderRadius: 0 }}
           >
@@ -30,7 +31,7 @@ export default function ImageKeyboard(props: Props) {
           fullWidth
           variant="outlined"
           onClick={() => {
-            props.onDeleteButtonPushedFunc();
+            onDeleteButtonPushedFunc();
           }}
           style={{
             borderRadius: 0,
