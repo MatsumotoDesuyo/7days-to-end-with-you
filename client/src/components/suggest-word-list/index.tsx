@@ -6,6 +6,7 @@ import {
   Table,
   TableRow,
   TableBody,
+  Typography,
 } from '@mui/material';
 
 type Props = {
@@ -22,7 +23,7 @@ export default function SuggestWordList(props: Props) {
     <>
       {wordMeans !== null &&
         (wordMeans.length === 0 ? (
-          <p>候補となる単語は見つかりませんでした。</p>
+          <Typography>候補となる単語は見つかりませんでした。</Typography>
         ) : (
           <TableContainer>
             <Table size="small">
