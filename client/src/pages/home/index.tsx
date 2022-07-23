@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { Button, Stack, TextField, Typography, Grid } from '@mui/material';
+import { Button, Stack, TextField, Typography, Grid, Box } from '@mui/material';
 import './index.scss';
 import axios from 'axios';
 import Footer from '../../components/footer';
@@ -116,6 +116,24 @@ export default class Home extends React.Component<{}, HomeState> {
             </Grid>
             <SuggestWordList wordMeans={wordMeans} />
             <SuggestTextList inputText={inputText} />
+            <Box p={3} />
+            <Typography variant="h5">注意事項</Typography>
+            <Typography>
+              これは単純にシーザー暗号を解読するだけのツールです。
+              <br />7 Days to End with
+              Youでは一部単純なシーザー暗号のみでは解読できない単語が存在します。
+              <br />
+              また、辞書のデータベースに存在しない単語は辞書検索を行っても見つかりません。
+              <br />
+              これだけで全てが解読できるものではないので、プレイを補助する目的でご使用ください。
+            </Typography>
+            <Typography>
+              当ゲームをプレイする中で、このゲームは主に英語圏の人をターゲットにしており、日本語の話者はゲーム開発者が意図していないハンデを負うように感じました。
+              <br />
+              これはそのハンデを無くそうという試みです。
+              <br />
+              上手く使ってゲームを楽しんでください。
+            </Typography>
           </Stack>
         </Stack>
         <Footer />
