@@ -9,7 +9,7 @@ import ImageKeyboard from '../../components/image-keyboard';
 
 type HomeState = {
   inputText: string;
-  wordMeans: WordMean[];
+  wordMeans: WordMean[] | null;
 };
 
 export default class Home extends React.Component<{}, HomeState> {
@@ -17,7 +17,7 @@ export default class Home extends React.Component<{}, HomeState> {
     super(props);
     this.state = {
       inputText: '',
-      wordMeans: [],
+      wordMeans: null,
     };
   }
 
@@ -40,17 +40,17 @@ export default class Home extends React.Component<{}, HomeState> {
     if (upperStr != null) {
       this.setState(() => ({
         inputText: upperStr,
-        wordMeans: [],
+        wordMeans: null,
       }));
     }
   };
 
   searchWord = async () => {
     const { inputText } = this.state;
-    const { data } = await axios.get('/api/search-word', {
+    const { data } = await axios.get<WordMean[]>('/api/search-word', {
       params: { word: inputText },
     });
-    if (data.length === 0) return;
+    // if (data.length === 0) return;
     this.setState(() => ({
       wordMeans: data,
     }));
