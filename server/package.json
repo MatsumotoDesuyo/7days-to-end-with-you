@@ -32,7 +32,8 @@
     "log4js": "^6.3.0",
     "mysql2": "^2.2.5",
     "mysql2-promise": "^0.1.4",
-    "sqlite3": "^5.0.8"
+    "sqlite3": "^5.0.8",
+    "rimraf": "^3.0.2"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.19",
