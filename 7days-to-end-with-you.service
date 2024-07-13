@@ -1,0 +1,14 @@
+# このファイルを/etc/systemd/system配下に置く
+[Unit]
+Description=Node.js App
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/bash /projects/7days-to-end-with-you/start.sh
+WorkingDirectory=/projects/7days-to-end-with-you/server/dist
+Restart=always
+Type=forking
+
+[Install]
+WantedBy=multi-user.target
