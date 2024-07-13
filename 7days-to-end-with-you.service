@@ -12,3 +12,13 @@ Type=forking
 
 [Install]
 WantedBy=multi-user.target
+
+# 以下のコマンドで動作確認
+# systemctl start 7days-to-end-with-you.service
+# systemctl status nodejs-app.service
+# journalctl -u nodejs-app.service | less
+
+# 以下のコマンドでsystemctlで自動起動に設定
+# systemctl enable nodejs-app.service
+# systemctl is-enabled nodejs-app.service
+# reboot
