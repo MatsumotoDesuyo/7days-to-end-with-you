@@ -1,41 +1,35 @@
-# デプロイ (このリポジトリの責任範囲)
+# DEPLOYMENT
 
-このアプリは外部プラットフォーム **my-server** がデプロイ・運用する。
-責任分担は **build / release / run の分離** (Twelve-Factor App, Factor V) に従う。
+このアプリは外部プラットフォーム **my-server** が運用する。app ↔ platform の責任分担は
+**The Twelve-Factor App** を契約言語として定める。個別の判断は列挙せず、以下の原則から
+導出する。規範の正本と根拠は my-server:`docs/adr/0006`。
 
-- このリポジトリが所有するのは **build** のみ:
-  ソースを**不変アーティファクト**にし、**実行時契約**を宣言する。ここで終わる。
-- **release / run** (設定・秘密の注入、配置、host での pull・起動、リバースプロキシ、
-  TLS、cron/timer、バックアップ、監視) は**プラットフォームが所有する**。ここには持ち込まない。
-- 受け渡しの境界は不変アーティファクトと契約。アプリはプラットフォームの
-  "実装" ではなく "契約 (インターフェース)" にのみ依存する。
-  （"You build it, you run it" とは意図的に逆。run はプラットフォームが担う。）
+## 原則
 
-## あなた (このリポジトリの変更者) の責任
-- [x] GHCR に準拠イメージを push する (.github/workflows/build.yml)
-- [x] 実行時契約を正しく保つ: 待受ポート・(あれば) 環境変数キー
-- [ ] host での起動 (systemd 直起動を含む)、リバースプロキシ、TLS を**作らない**
-      — かつての systemd 直起動はプラットフォーム側のコンテナ運用に置換済み
+1. **アプリは Twelve-Factor ワークロードである。** 十二の factor はアプリ側の義務であり、
+   アプリがそれを満たす限り、プラットフォームはアプリ固有の知識なしに運用できる。
 
-## 契約 (プラットフォームが消費する)
-- アーティファクト: `ghcr.io/matsumotodesuyo/7days-to-end-with-you:server`
-- 待受: 5001
-- 静的コンテンツ (client) は build 成果物を出す。配信はプラットフォーム (Caddy)。
+2. **Build / release / run (Factor V).** アプリは *build* を、プラットフォームは
+   *release* と *run* を所有する。受け渡しの境界は不変アーティファクトである。
 
-Node バージョン更新などプラットフォームに関わる話は Issue 経由 (from-infra 参照)。
+3. **横断的関心事は同じ軸で分割する。** アプリは該当 factor に従って intent と signal を
+   宣言・emit し、プラットフォームが mechanism と execution を担う。
+   - Config (III) — 設定・秘密
+   - Backing services (IV) / Processes (VI) / Disposability (IX) — 永続状態と障害耐性
+   - Logs (XI) / Telemetry (*Beyond the Twelve-Factor App*) — 監視
+   - Admin processes (XII) — スケジュール
 
-## 契約面 — アプリが宣言・提供すべきもの (Twelve-Factor 上の義務)
+## 導出ルール
 
-「イメージ・ポート・env」だけでなく、以下もアプリの契約。詳細は my-server の ADR 0006。
+「アプリは X を所有・関知すべきか」は次で判定する。
 
-- **設定 (III)**: 秘密は値を持たず環境変数から読む。
-- **状態 (IV/VI)**: 永続状態は宣言した backing service (DB) のみ。他は持たない (ステートレス)。
-- **障害耐性 (IX)**: いつ殺されても、復元済み DB を渡されても起動できる。
-- **健全性**: 正直な health を提供する (無ければ追加)。プラットフォームの死活監視が使う。
-- **計測 (Telemetry)**: ドメインの重要経路を計測し、異常を silent にしない。
-  (例: 「取得 0 件」を成功扱いにせず警告/例外を emit する — d-data-server#7 の教訓)
-- **スケジュール (XII)**: 定期処理の「何を・いつ」はアプリの仕様。理想は in-process 実装。
-  現状はプラットフォーム側 timer が暫定代行 (移行は別 Issue で判断)。
+- X が十二の factor のいずれかなら → **アプリの義務**（宣言・emit する）。
+  その背後の *mechanism* は → プラットフォーム。
+- X がドメイン固有の価値判断（何が異常か／何をいつ／何が永続状態か）なら → **アプリが宣言する**。
+- それ以外の運用 *mechanism*（pull・起動・reverse proxy・TLS・backup・監視・通知の実装）は
+  → プラットフォーム。
 
-プラットフォームは上記を前提に release/run/backup/監視/通知を提供する。その機構
-(host での pull・起動、リバースプロキシ、TLS、バックアップ、通知経路) はアプリの関心外。
+## プラットフォームへの依頼
+
+契約（アーティファクト・ポート・必要な環境変数など）の変更や運用への要望は、
+このリポジトリの Issue に起票すれば my-server 側が拾う。
