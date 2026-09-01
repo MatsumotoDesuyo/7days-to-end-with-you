@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# ボイスメモ作業ディレクトリ (ローカル限定)
+voice_memos/
