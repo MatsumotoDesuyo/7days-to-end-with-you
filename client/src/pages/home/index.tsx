@@ -2,14 +2,10 @@ import React, { ChangeEvent } from 'react';
 import { Button, Stack, TextField, Typography, Grid, Box } from '@mui/material';
 import './index.scss';
 import axios from 'axios';
-import ReactGa from 'react-ga4';
 import Footer from '../../components/footer';
 import SuggestTextList from '../../components/suggest-text-list';
 import SuggestWordList, { WordMean } from '../../components/suggest-word-list';
 import ImageKeyboard from '../../components/image-keyboard';
-
-ReactGa.initialize('G-70356QDZEN');
-ReactGa.send('pageview');
 
 type HomeState = {
   inputText: string;
