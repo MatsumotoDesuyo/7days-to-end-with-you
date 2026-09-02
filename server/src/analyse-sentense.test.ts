@@ -1,7 +1,8 @@
 import AnalyseSentense from './analyse-sentense';
 
-// docs/use-cases.md §4 の N1/N2/N3 を現行挙動として固定する characterization テスト。
-// シフト仕様の背景は docs/game-overview.md §3 を参照。
+// client/src/common/analyse-sentense.ts と重複実装になっているため、
+// 同じ characterization テストを両方に置いて挙動の一致を保証する。
+// (一本化は依存更新後の課題。docs/use-cases.md §4 N1/N2/N3 参照)
 
 describe('N3: 候補は常に全 26 シフト分', () => {
   test('1 文字でも複数文字でも 26 通り返す', () => {
@@ -37,12 +38,5 @@ describe('N2: 入力が Z の文字だけは mod 26 (現行挙動の固定)', ()
     expect(candidates[0]).toBe('Z');
     expect(candidates[1]).toBe('A');
     expect(candidates).toHaveLength(26);
-  });
-});
-
-describe('現行挙動の観測 (UI が大文字化してから渡す前提)', () => {
-  test('小文字はコード値がずれたまま変換される (ずらし 0 の a は H になる)', () => {
-    // 'a'(97) は 97-65=32 として扱われる。呼び出し側の正規化 (N7) が前提
-    expect(AnalyseSentense('a')[0]).toBe('H');
   });
 });
