@@ -39,6 +39,15 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 - その背後の *mechanism* / *execution* (pull・起動・proxy・TLS・backup・監視・通知・収集の実装) → **platform**。
 - 「誰が見られるか」は所有と独立: そのサービスの telemetry は**両者が読める**。
 
+## リリースの受け渡し (build → release)
+
+build と release/run の境界は不変アーティファクトである (Factor V)。アプリは *build* を所有し、生成したアーティファクトの identity を platform に渡す。release と run (どこへ・どう配置するか) は platform が実行し、アプリはそれを知らない・触らない (ホストへの SSH も配置先の知識も持たない)。
+
+- アプリは不変タグ `sha-<gitsha>` でイメージを push し (floating タグに依存しない)、build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
+- platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。
+- **リリース履歴の正本は platform 側の台帳 (Git)** であり、ロールバックはその revert である。
+- 根拠と機構は ADR 0008。
+
 ## 変更の要望
 
 契約 (アーティファクト・ポート・環境変数・emit する signal など) の変更や運用への要望は、そのアプリの Issue に起票する。
