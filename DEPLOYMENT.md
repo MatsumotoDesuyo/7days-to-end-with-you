@@ -26,9 +26,11 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 
 責任 (所有) と可視性は別の軸である。**収集の機構は platform が所有するが、telemetry (logs / metrics / traces / errors) は両者が読める。**
 
-- アプリはログを stdout にイベントとして出し (Factor XI)、telemetry は OpenTelemetry 形式で emit する。全 signal に `service=<name>` を付ける。
+- アプリの基本義務は、ログを stdout にイベントとして出すこと (Factor XI) と、全 signal に `service=<name>` が付くこと。コンテナ単位の CPU / メモリと stdout ログは platform が **SDK なしで**収集する (cAdvisor / Alloy)。
+- アプリ内部の metrics / traces (OpenTelemetry SDK) は**任意**。emit するなら OpenTelemetry 形式とする。SDK は数十 MB のメモリを使うため、導入は自サービスの規模と資源の余裕 (下記で読める) に照らしてアプリが費用対効果で判断する。errors (Sentry SDK) も同じ基準で判断してよい。
 - telemetry は単一の共有プレーンに集約され、platform とアプリの双方が (自サービスのスライスを) 読める。コピーを分けない。
 - 他アプリのデータ・platform の秘密は隔離される (最小権限)。
+- 資源の実使用は同じプレーンで読める: サービス別 CPU / メモリはダッシュボード `my-server-overview`、または `container_memory_working_set_bytes{service=<name>}` / `rate(container_cpu_usage_seconds_total{service=<name>}[5m])`。host 全体の容量と余裕は `node_memory_MemTotal_bytes` / `node_memory_MemAvailable_bytes`。現在、サービス別の上限は設けておらず host の余裕を共有している。上限を設ける場合は platform が宣言する。
 - 閲覧先 (共有プレーン): logs / metrics は **Grafana** https://maroonkinkajou2355.grafana.net (Explore またはダッシュボード、`service=<name>` で絞り込む)。errors は **Sentry** https://howel.sentry.io (project = サービス名)。
 - **アプリ側のエージェントは、このリポジトリに `.mcp.json` が提供されている場合、そこに定義された read-only MCP で上記を直接読める**: `grafana-ro` (logs / metrics)、`sentry-ro` (errors)。自サービスの障害調査・エラー確認はまず両 MCP で自律的に行い、人に telemetry を貼ってもらう前提にしない。書き込み権限はなく、他サービスの秘密には届かない。
 - platform が Discord に通知するのは閾値を超えたエラー (regression / 急増) だけで、日常のエラーは通知されない。よって自サービスのエラーは `sentry-ro` で能動的に確認する。
