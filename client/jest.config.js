@@ -12,5 +12,6 @@ module.exports = {
   },
   collectCoverage: true,
   coverageDirectory: 'coverage',
-  coverageProvider: 'v8',
+  // v8 プロバイダは jest 27 + Node 22 で v8-to-istanbul が非互換のため babel を使用
+  coverageProvider: 'babel',
 };

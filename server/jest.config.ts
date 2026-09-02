@@ -31,7 +31,8 @@ export default {
   // ],
 
   // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: 'v8',
+  // (v8 プロバイダは jest 27 + Node 22 で v8-to-istanbul が非互換のため babel を使用)
+  coverageProvider: 'babel',
 
   // A list of reporter names that Jest uses when writing coverage reports
   // coverageReporters: [
