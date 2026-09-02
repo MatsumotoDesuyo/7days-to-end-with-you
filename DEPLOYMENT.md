@@ -29,6 +29,7 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 - アプリはログを stdout にイベントとして出し (Factor XI)、telemetry は OpenTelemetry 形式で emit する。全 signal に `service=<name>` を付ける。
 - telemetry は単一の共有プレーンに集約され、platform とアプリの双方が (自サービスのスライスを) 読める。コピーを分けない。
 - 他アプリのデータ・platform の秘密は隔離される (最小権限)。
+- 閲覧は共有 observability プレーン **Grafana** で行う: https://maroonkinkajou2355.grafana.net (Explore またはダッシュボード)。自分のサービスは `service=<name>` で絞り込む。
 
 ## 導出ルール
 
