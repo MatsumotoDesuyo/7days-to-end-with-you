@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import SuggestWordList from './index';
 

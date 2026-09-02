@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   TableContainer,
   TableHead,
@@ -28,7 +27,7 @@ export default function SuggestTextList(props: Props) {
         <TableBody>
           {inputText !== '' &&
             suggestTexts.map((txt, idx) => (
-              <TableRow>
+              <TableRow key={idx}>
                 <TableCell>{idx}</TableCell>
                 <TableCell>{txt}</TableCell>
               </TableRow>

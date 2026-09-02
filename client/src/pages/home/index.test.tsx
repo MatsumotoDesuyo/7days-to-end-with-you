@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import axios from 'axios';
 import Home from './index';

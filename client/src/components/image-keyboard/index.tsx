@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button, Grid, Avatar } from '@mui/material';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 
@@ -12,7 +11,7 @@ export default function ImageKeyboard(props: Props) {
   return (
     <Grid container columnSpacing={0.5} rowSpacing={0.5}>
       {alphabets.map((c) => (
-        <Grid item xs={4} md={1.3333}>
+        <Grid item xs={4} md={1.3333} key={c}>
           <Button
             fullWidth
             variant="outlined"

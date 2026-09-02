@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   TableContainer,
   TableHead,
@@ -35,7 +34,7 @@ export default function SuggestWordList(props: Props) {
               </TableHead>
               <TableBody>
                 {wordMeans.map((wm) => (
-                  <TableRow>
+                  <TableRow key={wm.word}>
                     <TableCell>{wm.word}</TableCell>
                     <TableCell>{wm.mean}</TableCell>
                   </TableRow>
