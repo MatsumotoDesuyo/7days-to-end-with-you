@@ -7,6 +7,14 @@
         "GRAFANA_URL": "https://maroonkinkajou2355.grafana.net",
         "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_VIEWER_TOKEN}"
       }
+    },
+    "sentry-ro": {
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server@latest"],
+      "env": {
+        "SENTRY_ACCESS_TOKEN": "${SENTRY_VIEWER_TOKEN}",
+        "SENTRY_HOST": "sentry.io"
+      }
     }
   }
 }
