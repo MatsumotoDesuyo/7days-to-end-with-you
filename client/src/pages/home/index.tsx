@@ -32,17 +32,12 @@ export default class Home extends React.Component<{}, HomeState> {
    * 入力された文字から推測文字列を生成する
    */
   showAnalyzeText = (inputStr: string) => {
-    //入力された文字列を半角英数のみにする
-    const extractedStr = inputStr.match('[a-zA-Z]*')?.toString() ?? '';
-    //文字列を大文字に変換
-    const upperStr = extractedStr.toString().toUpperCase();
-    //表示
-    if (upperStr != null) {
-      this.setState(() => ({
-        inputText: upperStr,
-        wordMeans: null,
-      }));
-    }
+    //入力された文字列から非英字をすべて除去し、大文字に変換する (#4)
+    const upperStr = inputStr.replace(/[^a-zA-Z]/g, '').toUpperCase();
+    this.setState(() => ({
+      inputText: upperStr,
+      wordMeans: null,
+    }));
   };
 
   searchWord = async () => {

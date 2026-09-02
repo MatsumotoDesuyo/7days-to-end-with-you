@@ -28,18 +28,18 @@ describe('UCT-02 テキスト欄への直接入力 (UC2/N7)', () => {
     expect(screen.getAllByText('DOG')).toHaveLength(2);
   });
 
-  test('N7: 先頭から連続する英字のみ採用する (現行挙動の固定)', () => {
+  test('N7: 非英字はすべて除去される (#4 で変更した仕様)', () => {
     render(<Home />);
     typeText('abc1def');
-    expect(textbox().value).toBe('ABC');
+    expect(textbox().value).toBe('ABCDEF');
   });
 
-  test('N7: 先頭が非英字なら空になる (現行挙動の固定)', () => {
+  test('N7: 先頭の非英字も除去され、後続の英字は残る', () => {
     render(<Home />);
     // 注: 先頭スペースは type="email" の DOM 仕様で入力段階で刈り取られるため、
     // 正規化ロジックに到達する「先頭非英字」は数字等で検証する
-    typeText('1dog');
-    expect(textbox().value).toBe('');
+    typeText('1dog!');
+    expect(textbox().value).toBe('DOG');
   });
 });
 

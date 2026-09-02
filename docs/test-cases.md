@@ -39,7 +39,7 @@
 |----|---------|---------|------|------|
 | UT-01 | analyse-sentense (client 利用経路) | N1: 25 文字周期・Z 非到達・実例復号 / N2: Z 入力の mod 26 / N3: 26 候補 / 小文字の観測挙動 | client `common/analyse-sentense.test.ts` | 済（実装は server に一本化済み。client は再エクスポート経路を検証） |
 | UT-02 | analyse-sentense (server 実装) | UT-01 と同一 | server `src/analyse-sentense.test.ts` | 済（カバレッジ 100%） |
-| UT-03 | 入力正規化 (showAnalyzeText) | 先頭連続英字のみ抽出・大文字化 | client `pages/home/index.test.tsx`（コンポーネント経由） | 済（#4 の挙動変更時にユニット分離を検討） |
+| UT-03 | 入力正規化 (showAnalyzeText) | 非英字をすべて除去して大文字化（#4 で変更） | client `pages/home/index.test.tsx`（コンポーネント経由） | 済 |
 | UT-04 | SuggestTextList | 26 行表示・ずらし量と行の対応・空入力時は非表示 | client `components/suggest-text-list/index.test.tsx` | 済 |
 | UT-05 | SuggestWordList | null/0 件/ヒットありの 3 状態の表示 | client `components/suggest-word-list/index.test.tsx` | 済 |
 | UT-06 | ImageKeyboard | 全 26 ボタンが対応する大文字でコールバックを呼ぶ・BackSpace・記号画像の表示 | client `components/image-keyboard/index.test.tsx` | 済 |
