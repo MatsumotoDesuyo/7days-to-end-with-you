@@ -8,6 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import { useI18n } from '../../i18n';
+
 type Props = {
   wordMeans: WordMean[] | null;
 };
@@ -18,18 +20,19 @@ export type WordMean = {
 
 export default function SuggestWordList(props: Props) {
   const { wordMeans } = props;
+  const { t } = useI18n();
   return (
     <>
       {wordMeans !== null &&
         (wordMeans.length === 0 ? (
-          <Typography>候補となる単語は見つかりませんでした。</Typography>
+          <Typography>{t('notFound')}</Typography>
         ) : (
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>単語</TableCell>
-                  <TableCell>意味</TableCell>
+                  <TableCell>{t('wordHeader')}</TableCell>
+                  <TableCell>{t('meaningHeader')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

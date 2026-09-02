@@ -32,6 +32,7 @@
 | UCT-06 | 空入力・word なしで辞書検索してもサーバーは落ちず空応答を返す | N8 | server `src/api.test.ts` | 済 |
 | UCT-07 | ヒット件数は 100 件以下 | N5 | server `src/api.test.ts` | 済 |
 | UCT-08 | `PORT` 環境変数で待受ポートを変更できる（デフォルト 5001） | Factor III (#7) | server `src/api.test.ts`（PORT 上書きで起動して全 API テストを実行） | 済 |
+| UCT-09 | 言語切替ボタンで ja/en が切り替わり、選択が保存される | UC5, N10 | client `pages/home/index.test.tsx` | 済（#2） |
 
 ## 3. ユニットテスト
 
@@ -45,6 +46,7 @@
 | UT-06 | ImageKeyboard | 全 26 ボタンが対応する大文字でコールバックを呼ぶ・BackSpace・記号画像の表示 | client `components/image-keyboard/index.test.tsx` | 済 |
 | UT-07 | logger | ログが stdout へ出力されること（Factor XI の契約） | server `src/logger.test.ts` | 済 |
 | UT-08 | search-word ハンドラ | SQL エラー時に 500 + 空配列で必ず応答する。成功時は候補 26 件（小文字）で照会しヒット行を返す | server `src/search-word.test.ts`（db 注入のファクトリ化により単体検証） | 済（#3） |
+| UT-09 | 初期言語の解決 (resolveInitialLang) | 保存済み選択が最優先、なければブラウザ言語（ja 系→ja、他→en） | client `src/i18n.test.ts` | 済（#2） |
 
 ## 4. テスト目標
 

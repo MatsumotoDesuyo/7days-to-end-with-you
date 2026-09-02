@@ -7,6 +7,7 @@ import {
   TableBody,
 } from '@mui/material';
 import { AnalyseSentense } from 'shared';
+import { useI18n } from '../../i18n';
 
 type Props = {
   inputText: string;
@@ -14,14 +15,15 @@ type Props = {
 
 export default function SuggestTextList(props: Props) {
   const { inputText } = props;
+  const { t } = useI18n();
   const suggestTexts = AnalyseSentense(inputText);
   return (
     <TableContainer>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>ずらし量</TableCell>
-            <TableCell>推測文字</TableCell>
+            <TableCell>{t('shiftHeader')}</TableCell>
+            <TableCell>{t('candidateHeader')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

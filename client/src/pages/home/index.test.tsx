@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { Mocked } from 'vitest';
 import axios from 'axios';
 import Home from './index';
+import { I18nProvider } from '../../i18n';
 
 // docs/use-cases.md の UC1/UC2/UC4 と N4/N7 の画面側の証明
 
@@ -87,6 +88,51 @@ describe('UCT-03 辞書検索 (UC3)', () => {
     expect(
       screen.queryByText('候補となる単語は見つかりませんでした。')
     ).toBeNull();
+  });
+});
+
+describe('UCT-09 言語切替 (UC5/N10)', () => {
+  // jsdom の navigator.language は en-US のため、Provider 配下の初期表示は英語
+  test('初期表示はブラウザ言語に従い、切替ボタンで日本語へ変わる', () => {
+    window.localStorage.removeItem('lang');
+    render(
+      <I18nProvider>
+        <Home />
+      </I18nProvider>
+    );
+    expect(
+      screen.getByRole('button', { name: 'Dictionary search' })
+    ).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: '日本語' }));
+    expect(screen.getByRole('button', { name: '辞書検索' })).toBeTruthy();
+    expect(screen.getByText('注意事項')).toBeTruthy();
+  });
+
+  test('選択した言語は保存され、html の lang 属性も更新される', () => {
+    window.localStorage.removeItem('lang');
+    render(
+      <I18nProvider>
+        <Home />
+      </I18nProvider>
+    );
+    fireEvent.click(screen.getByRole('button', { name: '日本語' }));
+    expect(window.localStorage.getItem('lang')).toBe('ja');
+    expect(document.documentElement.lang).toBe('ja');
+
+    fireEvent.click(screen.getByRole('button', { name: 'English' }));
+    expect(window.localStorage.getItem('lang')).toBe('en');
+  });
+
+  test('保存済みの選択があれば初期表示に反映される', () => {
+    window.localStorage.setItem('lang', 'ja');
+    render(
+      <I18nProvider>
+        <Home />
+      </I18nProvider>
+    );
+    expect(screen.getByRole('button', { name: '辞書検索' })).toBeTruthy();
+    window.localStorage.removeItem('lang');
   });
 });
 
