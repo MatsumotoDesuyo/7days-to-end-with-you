@@ -2,6 +2,8 @@ import AnalyseSentense from './analyse-sentense';
 
 // docs/use-cases.md §4 の N1/N2/N3 を現行挙動として固定する characterization テスト。
 // シフト仕様の背景は docs/game-overview.md §3 を参照。
+// 実装は server 側に一本化済み (#6)。本スイートは client からの利用経路
+// (再エクスポート) を通した検証として維持する。
 
 describe('N3: 候補は常に全 26 シフト分', () => {
   test('1 文字でも複数文字でも 26 通り返す', () => {
