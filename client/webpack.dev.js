@@ -10,16 +10,16 @@ module.exports = merge(common, {
     publicPath: '/js/',
   },
   devServer: {
-    contentBase: path.join(__dirname, 'public'),
+    static: path.join(__dirname, 'public'),
     port: 3000,
     host: '0.0.0.0',
     historyApiFallback: true,
-    proxy: {
-      '/api': {
+    proxy: [
+      {
+        context: ['/api'],
         target: 'http://localhost:5001',
       },
-    },
-    inline: true,
+    ],
     hot: true,
   },
   devtool: 'inline-source-map',
