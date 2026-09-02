@@ -41,3 +41,31 @@ jobs:
             ghcr.io/matsumotodesuyo/7days-to-end-with-you:server-${{ steps.sha.outputs.short }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # build 完了後、my-server に「この SHA を deploy せよ」と伝える (ADR 0008 / DEPLOYMENT.md)。
+  # GitHub App の短命トークンで my-server の deploy.yml を workflow_dispatch する。
+  dispatch-deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Short SHA
+        id: sha
+        run: echo "short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Mint my-server deploy token (GitHub App)
+        id: token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: MatsumotoDesuyo
+          repositories: my-server
+
+      - name: Trigger my-server deploy
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+        run: |
+          gh workflow run deploy.yml \
+            --repo MatsumotoDesuyo/my-server --ref main \
+            -f service=7days-server \
+            -f tag=server-${{ steps.sha.outputs.short }}
