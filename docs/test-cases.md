@@ -32,7 +32,8 @@
 | UCT-06 | 空入力・word なしで辞書検索してもサーバーは落ちず空応答を返す | N8 | server `src/api.test.ts` | 済 |
 | UCT-07 | ヒット件数は 100 件以下 | N5 | server `src/api.test.ts` | 済 |
 | UCT-08 | `PORT` 環境変数で待受ポートを変更できる（デフォルト 5001） | Factor III (#7) | server `src/api.test.ts`（PORT 上書きで起動して全 API テストを実行） | 済 |
-| UCT-09 | 言語切替ボタンで ja/en が切り替わり、選択が保存される | UC5, N10 | client `pages/home/index.test.tsx` | 済（#2） |
+| UCT-09 | 言語セレクタで 8 言語が切り替わり、選択が保存される | UC5, N10 | client `pages/home/index.test.tsx` | 済（#2） |
+| UCT-10 | 辞書検索が選択言語の辞書を引く（en=英英 / fr=訳語+語義 / 未対応は ja へフォールバック） | UC3, N10 | server `src/api.test.ts`（実辞書） + `src/search-word.test.ts`（リゾルバ単体） | 済（#2） |
 
 ## 3. ユニットテスト
 

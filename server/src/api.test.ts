@@ -100,6 +100,37 @@ describe('GET /api/search-word', () => {
     expect(res.body).toBe('');
   });
 
+  test('N10: lang=en は英英辞書 (英語の語義) を返す', async () => {
+    const res = await get('/api/search-word?word=RQH&lang=en');
+    expect(res.status).toBe(200);
+    const rows: { word: string; mean: string }[] = JSON.parse(res.body);
+    const one = rows.find((row) => row.word === 'one');
+    expect(one).toBeDefined();
+    expect(one!.mean.length).toBeGreaterThan(0);
+    // 英英辞書なので日本語 (かな) を含まない
+    expect(one!.mean).not.toMatch(/[ぁ-んァ-ン]/);
+  });
+
+  test('N10: lang=fr は仏語訳 + 英語語義を返す', async () => {
+    const res = await get('/api/search-word?word=RQH&lang=fr');
+    expect(res.status).toBe(200);
+    const rows: { word: string; mean: string }[] = JSON.parse(res.body);
+    const one = rows.find((row) => row.word === 'one');
+    expect(one).toBeDefined();
+    // 「訳語 — 語義」形式
+    expect(one!.mean).toContain(' — ');
+    expect(one!.mean).not.toMatch(/[ぁ-んァ-ン]/);
+  });
+
+  test('N10: 未対応の lang は日本語 (ejdict) にフォールバックする', async () => {
+    const res = await get('/api/search-word?word=RQH&lang=xx');
+    expect(res.status).toBe(200);
+    const rows: { word: string; mean: string }[] = JSON.parse(res.body);
+    const one = rows.find((row) => row.word === 'one');
+    expect(one).toBeDefined();
+    expect(one!.mean).toMatch(/[ぁ-んァ-ン]/);
+  });
+
   test('N6/N9: 辞書に存在し得ない文字列はヒット 0 件で正常', async () => {
     const res = await get('/api/search-word?word=QQQQQQQQQQQQ');
     expect(res.status).toBe(200);

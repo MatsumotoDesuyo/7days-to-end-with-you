@@ -32,10 +32,16 @@ function createFakeDb(options: {
   return fake as unknown as sqlite3.Database;
 }
 
-function invoke(db: sqlite3.Database, word?: string): InvokeResult {
-  const req = {
-    query: word === undefined ? {} : { word },
-  } as unknown as express.Request;
+function invoke(
+  db: sqlite3.Database,
+  word?: string,
+  lang?: string,
+  onResolve?: (lang: string) => void
+): InvokeResult {
+  const query: Record<string, string> = {};
+  if (word !== undefined) query.word = word;
+  if (lang !== undefined) query.lang = lang;
+  const req = { query } as unknown as express.Request;
   const result: InvokeResult = { sent: false };
   const res = {
     status(code: number) {
@@ -48,7 +54,11 @@ function invoke(db: sqlite3.Database, word?: string): InvokeResult {
       return this;
     },
   } as unknown as express.Response;
-  createSearchWordHandler(db)(req, res);
+  const resolveDb = (requested: string) => {
+    if (onResolve) onResolve(requested);
+    return db;
+  };
+  createSearchWordHandler(resolveDb)(req, res);
   return result;
 }
 
@@ -76,5 +86,12 @@ describe('UT-08 search-word ハンドラ', () => {
     const result = invoke(createFakeDb({}), '');
     expect(result.sent).toBe(true);
     expect(result.body).toBeUndefined();
+  });
+
+  test('N10: lang パラメータがそのまま辞書リゾルバに渡る (未指定は ja)', () => {
+    const requested: string[] = [];
+    invoke(createFakeDb({}), 'RQH', 'fr', (lang) => requested.push(lang));
+    invoke(createFakeDb({}), 'RQH', undefined, (lang) => requested.push(lang));
+    expect(requested).toEqual(['fr', 'ja']);
   });
 });

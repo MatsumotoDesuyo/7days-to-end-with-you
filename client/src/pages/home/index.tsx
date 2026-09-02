@@ -6,8 +6,9 @@ import {
   Typography,
   Grid,
   Box,
-  ToggleButton,
-  ToggleButtonGroup,
+  Link,
+  MenuItem,
+  Select,
 } from '@mui/material';
 import './index.css';
 import axios from 'axios';
@@ -15,7 +16,7 @@ import Footer from '../../components/footer';
 import SuggestTextList from '../../components/suggest-text-list';
 import SuggestWordList, { WordMean } from '../../components/suggest-word-list';
 import ImageKeyboard from '../../components/image-keyboard';
-import { useI18n } from '../../i18n';
+import { LANG_OPTIONS, useI18n } from '../../i18n';
 import type { Lang } from '../../i18n';
 
 export default function Home() {
@@ -35,7 +36,7 @@ export default function Home() {
 
   const searchWord = async () => {
     const { data } = await axios.get<WordMean[]>('/api/search-word', {
-      params: { word: inputText },
+      params: { word: inputText, lang },
     });
     setWordMeans(data);
   };
@@ -45,17 +46,20 @@ export default function Home() {
       <Stack justifyContent="center" alignItems="center">
         <Stack maxWidth="md" justifyContent="center" spacing={2}>
           <Stack direction="row" justifyContent="flex-end">
-            <ToggleButtonGroup
+            <Select
               value={lang}
-              exclusive
               size="small"
-              onChange={(_event, next: Lang | null) => {
-                if (next !== null) setLang(next);
+              inputProps={{ 'aria-label': 'language' }}
+              onChange={(event) => {
+                setLang(event.target.value as Lang);
               }}
             >
-              <ToggleButton value="ja">日本語</ToggleButton>
-              <ToggleButton value="en">English</ToggleButton>
-            </ToggleButtonGroup>
+              {LANG_OPTIONS.map((option) => (
+                <MenuItem key={option.code} value={option.code}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
           </Stack>
           <Typography variant="h5" textAlign="center">
             7 Days to End with You
@@ -117,12 +121,8 @@ export default function Home() {
             {t('notes3')}
             <br />
             {t('notes4')}
-            {t('dictLangNote') !== '' && (
-              <>
-                <br />
-                {t('dictLangNote')}
-              </>
-            )}
+            <br />
+            <Link href="/attributions.html">{t('attributionLink')}</Link>
           </Typography>
           <Typography>
             {t('aboutHandicap1')}

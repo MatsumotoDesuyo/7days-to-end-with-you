@@ -71,7 +71,7 @@ describe('UCT-03 辞書検索 (UC3)', () => {
     expect(await screen.findByText('one')).toBeTruthy();
     expect(screen.getByText('一つの')).toBeTruthy();
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/search-word', {
-      params: { word: 'RQH' },
+      params: { word: 'RQH', lang: 'ja' },
     });
   });
 
@@ -91,9 +91,14 @@ describe('UCT-03 辞書検索 (UC3)', () => {
   });
 });
 
+function selectLanguage(nextLabel: string): void {
+  fireEvent.mouseDown(screen.getByRole('combobox'));
+  fireEvent.click(screen.getByRole('option', { name: nextLabel }));
+}
+
 describe('UCT-09 言語切替 (UC5/N10)', () => {
   // jsdom の navigator.language は en-US のため、Provider 配下の初期表示は英語
-  test('初期表示はブラウザ言語に従い、切替ボタンで日本語へ変わる', () => {
+  test('初期表示はブラウザ言語に従い、セレクタで日本語へ切り替わる', () => {
     window.localStorage.removeItem('lang');
     render(
       <I18nProvider>
@@ -104,9 +109,22 @@ describe('UCT-09 言語切替 (UC5/N10)', () => {
       screen.getByRole('button', { name: 'Dictionary search' })
     ).toBeTruthy();
 
-    fireEvent.click(screen.getByRole('button', { name: '日本語' }));
+    selectLanguage('日本語');
     expect(screen.getByRole('button', { name: '辞書検索' })).toBeTruthy();
     expect(screen.getByText('注意事項')).toBeTruthy();
+  });
+
+  test('フランス語など追加言語にも切り替えられる', () => {
+    window.localStorage.removeItem('lang');
+    render(
+      <I18nProvider>
+        <Home />
+      </I18nProvider>
+    );
+    selectLanguage('Français');
+    expect(
+      screen.getByRole('button', { name: 'Recherche dictionnaire' })
+    ).toBeTruthy();
   });
 
   test('選択した言語は保存され、html の lang 属性も更新される', () => {
@@ -116,11 +134,11 @@ describe('UCT-09 言語切替 (UC5/N10)', () => {
         <Home />
       </I18nProvider>
     );
-    fireEvent.click(screen.getByRole('button', { name: '日本語' }));
+    selectLanguage('日本語');
     expect(window.localStorage.getItem('lang')).toBe('ja');
     expect(document.documentElement.lang).toBe('ja');
 
-    fireEvent.click(screen.getByRole('button', { name: 'English' }));
+    selectLanguage('English');
     expect(window.localStorage.getItem('lang')).toBe('en');
   });
 

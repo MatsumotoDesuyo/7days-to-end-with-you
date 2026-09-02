@@ -4,9 +4,14 @@ import { AnalyseSentense } from 'shared';
 import { sysLogger } from './logger';
 
 // UC3: 辞書検索。全シフト候補のうち辞書に存在する単語を意味つきで返す。
-// db を注入するファクトリ形式にして、エラーパス (UT-08) を単体検証可能にする。
-export default function createSearchWordHandler(db: sqlite3.Database) {
+// lang パラメータで言語別辞書を引く (N10)。未指定・未対応言語は日本語 (ejdict)。
+// resolveDb を注入するファクトリ形式にして、エラーパス (UT-08) を単体検証可能にする。
+export default function createSearchWordHandler(
+  resolveDb: (lang: string) => sqlite3.Database
+) {
   return (req: express.Request, res: express.Response): void => {
+    const lang = req.query.lang?.toString() ?? 'ja';
+    const db = resolveDb(lang);
     db.serialize(() => {
       const searchWord = req.query.word?.toString() ?? '';
       if (searchWord === '') {

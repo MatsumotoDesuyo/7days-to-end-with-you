@@ -10,10 +10,9 @@
     },
     "sentry-ro": {
       "command": "npx",
-      "args": ["-y", "@sentry/mcp-server@latest"],
+      "args": ["-y", "@sentry/mcp-server@0.39.0"],
       "env": {
-        "SENTRY_ACCESS_TOKEN": "${SENTRY_VIEWER_TOKEN}",
-        "SENTRY_HOST": "sentry.io"
+        "SENTRY_ACCESS_TOKEN": "${SENTRY_VIEWER_TOKEN}"
       }
     }
   }

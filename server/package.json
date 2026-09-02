@@ -8,7 +8,7 @@
     "test": "vitest run",
     "lint": "eslint .",
     "clean": "rimraf dist/*",
-    "build": "npm run clean && tsc && cpx -C ejdict.sqlite3 ./dist"
+    "build": "npm run clean && tsc && cpx -C ejdict.sqlite3 ./dist && cpx -C \"dict/*.sqlite3\" ./dist/dict"
   },
   "dependencies": {
     "cpx": "^1.5.0",

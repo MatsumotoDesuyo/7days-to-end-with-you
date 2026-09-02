@@ -105,3 +105,6 @@ dist
 
 # ボイスメモ作業ディレクトリ (ローカル限定)
 voice_memos/
+
+# 辞書 ETL のダウンロードキャッシュ (scripts/build-dicts.mjs)
+.cache/

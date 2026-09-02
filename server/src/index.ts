@@ -20,8 +20,16 @@ const server = app.listen(port, () => {
   sysLogger.info(`Start on port ${port}.`);
 });
 
-const db = new sqlite3.Database('ejdict.sqlite3');
-app.get('/api/search-word', createSearchWordHandler(db));
+// 言語別辞書 (N10)。ja は従来の ejdict、他言語は scripts/build-dicts.mjs の生成物
+const DICT_LANGS = ['en', 'fr', 'it', 'de', 'es', 'pt', 'zh'];
+const dbs = new Map<string, sqlite3.Database>();
+dbs.set('ja', new sqlite3.Database('ejdict.sqlite3'));
+DICT_LANGS.forEach((lang) => {
+  dbs.set(lang, new sqlite3.Database(`dict/${lang}.sqlite3`));
+});
+const jaDb = dbs.get('ja') as sqlite3.Database;
+const resolveDb = (lang: string): sqlite3.Database => dbs.get(lang) ?? jaDb;
+app.get('/api/search-word', createSearchWordHandler(resolveDb));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(path.resolve(__dirname, '../public/index.html')));
@@ -31,8 +39,12 @@ app.get('*', (req, res) => {
 const shutdown = (signal: string) => {
   sysLogger.info(`Received ${signal}. Shutting down...`);
   server.close(() => {
-    db.close(() => {
-      process.exit(0);
+    let remaining = dbs.size;
+    dbs.forEach((db) => {
+      db.close(() => {
+        remaining -= 1;
+        if (remaining === 0) process.exit(0);
+      });
     });
   });
 };
