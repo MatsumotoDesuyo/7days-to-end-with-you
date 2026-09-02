@@ -1,3 +1,6 @@
+// Sentry の初期化は他モジュールの読み込みより先に行う必要がある (#14)
+import './instrument';
+import * as Sentry from '@sentry/node';
 import express from 'express';
 import { connectLogger } from 'log4js';
 import path from 'path';
@@ -34,6 +37,9 @@ app.get('/api/search-word', createSearchWordHandler(resolveDb));
 app.get('*', (req, res) => {
   res.sendFile(path.join(path.resolve(__dirname, '../public/index.html')));
 });
+
+// Express のエラーを Sentry へ emit する (#14)。未初期化時は no-op
+Sentry.setupExpressErrorHandler(app);
 
 // Factor IX (Disposability): SIGTERM/SIGINT で graceful shutdown する
 const shutdown = (signal: string) => {

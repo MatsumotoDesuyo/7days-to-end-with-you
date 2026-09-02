@@ -33,4 +33,5 @@
 ## 実行時契約 (アプリ側)
 
 - ポート: 環境変数 `PORT` (デフォルト 5001) / ログ: stdout のみ / SIGTERM・SIGINT で graceful shutdown
+- エラーは Sentry へ emit (#14)。`SENTRY_DSN` / `SENTRY_ENVIRONMENT` / `SENTRY_RELEASE` は platform が注入し、未設定時 (ローカル・CI) は無効。参照は sentry-ro MCP (org: howel, project: 7days-server)
 - 運用への要望・契約変更はこのリポジトリの Issue に起票する

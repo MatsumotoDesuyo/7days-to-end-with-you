@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import express from 'express';
 import sqlite3 from 'sqlite3';
 import { AnalyseSentense } from 'shared';
@@ -33,7 +34,9 @@ export default function createSearchWordHandler(
       stmt.all(strs, (err, rows) => {
         if (err) {
           // #3 (N8): エラー時にも必ず応答を返す (クライアントをハングさせない)
+          // #14: ハンドリング済みエラーも Sentry へ emit (未初期化時は no-op)
           sysLogger.error('search-word failed', err);
+          Sentry.captureException(err);
           res.status(500).send(JSON.stringify([]));
           return;
         }
