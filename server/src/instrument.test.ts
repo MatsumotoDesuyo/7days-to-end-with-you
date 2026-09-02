@@ -35,6 +35,7 @@ describe('UT-10 instrument (Sentry)', () => {
       dsn: 'https://public@sentry.example/1',
       environment: 'test-env',
       release: 'server-test123',
+      tracesSampleRate: 1.0,
     });
   });
 });

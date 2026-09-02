@@ -10,5 +10,9 @@ if (process.env.SENTRY_DSN) {
     dsn: process.env.SENTRY_DSN,
     environment: process.env.SENTRY_ENVIRONMENT,
     release: process.env.SENTRY_RELEASE,
+    // ADR 0010: アプリの信号 (リクエスト数・応答時間・エラー率・traces) も
+    // Sentry SDK の tracing で emit する。低トラフィックのため全量送信
+    // (Sentry の quota が問題になったら下げる)
+    tracesSampleRate: 1.0,
   });
 }
