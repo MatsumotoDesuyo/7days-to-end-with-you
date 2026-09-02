@@ -12,6 +12,7 @@
 // 環境変数: DICT_CACHE=ダウンロードキャッシュ dir (default: .cache/dicts)
 
 import { createRequire } from 'node:module';
+import { SUPPLEMENT } from './dict-supplement.mjs';
 import { createInterface } from 'node:readline';
 import { createReadStream } from 'node:fs';
 import { mkdir, copyFile, rm, access, writeFile } from 'node:fs/promises';
@@ -262,6 +263,23 @@ function writeSqlite(file, rows, attribution) {
   });
 }
 
+// WordNet に無い機能語・数詞をプロジェクト独自データで補完する (存在しない単語のみ)
+function applySupplement(rows, code) {
+  const existing = new Set(rows.map(([w]) => w));
+  let added = 0;
+  for (const [word, entry] of Object.entries(SUPPLEMENT)) {
+    if (existing.has(word)) continue;
+    if (code === 'en') {
+      rows.push([word, entry.gloss]);
+      added += 1;
+    } else if (entry[code] && entry[code].length > 0) {
+      rows.push([word, `${entry[code].join(', ')} — ${entry.gloss}`]);
+      added += 1;
+    }
+  }
+  if (added > 0) console.log(`${code}: supplement +${added} words`);
+}
+
 function reportCoverage(code, rows) {
   const words = new Set(rows.map(([w]) => w));
   const hit = BASIC_WORDS.filter((w) => words.has(w));
@@ -316,6 +334,7 @@ async function main() {
     }
     if (senses.length > 0) enRows.push([word, senses.join(' / ')]);
   }
+  applySupplement(enRows, 'en');
   reportCoverage('en', enRows);
   await writeSqlite(path.join(OUT_DIR, 'en.sqlite3'), enRows, [
     {
@@ -355,6 +374,7 @@ async function main() {
       }
       if (senses.length > 0) rows.push([word, senses.join(' / ')]);
     }
+    applySupplement(rows, target.code);
     reportCoverage(target.code, rows);
 
     if (licenseSrc) {

@@ -131,6 +131,20 @@ describe('GET /api/search-word', () => {
     expect(one!.mean).toMatch(/[ぁ-んァ-ン]/);
   });
 
+  test('N9: 機能語・数詞の補完辞書がヒットする (you / es の two)', async () => {
+    // WordNet は機能語を収録しないため、プロジェクト独自の補完で埋めている
+    // 'YOU' のずらし 0 は you
+    const resEn = await get('/api/search-word?word=YOU&lang=en');
+    const rowsEn: { word: string; mean: string }[] = JSON.parse(resEn.body);
+    expect(rowsEn.find((row) => row.word === 'you')).toBeDefined();
+    // MCR (es) は数詞にも欠落があり、two は補完由来
+    const resEs = await get('/api/search-word?word=YCT&lang=es');
+    const rowsEs: { word: string; mean: string }[] = JSON.parse(resEs.body);
+    const two = rowsEs.find((row) => row.word === 'two');
+    expect(two).toBeDefined();
+    expect(two!.mean).toContain('dos');
+  });
+
   test('N6/N9: 辞書に存在し得ない文字列はヒット 0 件で正常', async () => {
     const res = await get('/api/search-word?word=QQQQQQQQQQQQ');
     expect(res.status).toBe(200);
