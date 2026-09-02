@@ -7,7 +7,9 @@ import AnalyseSentense from './analyse-sentense';
 // 実サーバーを子プロセスとして起動し、同梱の実辞書 (ejdict.sqlite3) に
 // 対してブラックボックスで検証する (ソースコードを一切変更しないため)。
 
-const BASE_URL = 'http://127.0.0.1:5001';
+// PORT 環境変数で待受ポートを上書きして起動する (Factor III / #7 の検証を兼ねる)
+const PORT = 15001;
+const BASE_URL = `http://127.0.0.1:${PORT}`;
 const SERVER_ROOT = path.resolve(__dirname, '..');
 
 let server: ChildProcess;
@@ -47,7 +49,11 @@ beforeAll(async () => {
   server = spawn(
     process.execPath,
     ['-r', 'ts-node/register', 'src/index.ts'],
-    { cwd: SERVER_ROOT, stdio: 'ignore' }
+    {
+      cwd: SERVER_ROOT,
+      stdio: 'ignore',
+      env: { ...process.env, PORT: String(PORT) },
+    }
   );
   await waitForServer(60000);
 }, 90000);

@@ -31,6 +31,7 @@
 | UCT-05 | BackSpace で末尾 1 文字が消える。入力変更で辞書結果がリセットされる | UC4 | client `pages/home/index.test.tsx` | 済 |
 | UCT-06 | 空入力・word なしで辞書検索してもサーバーは落ちず空応答を返す | N8 | server `src/api.test.ts` | 済 |
 | UCT-07 | ヒット件数は 100 件以下 | N5 | server `src/api.test.ts` | 済 |
+| UCT-08 | `PORT` 環境変数で待受ポートを変更できる（デフォルト 5001） | Factor III (#7) | server `src/api.test.ts`（PORT 上書きで起動して全 API テストを実行） | 済 |
 
 ## 3. ユニットテスト
 

@@ -14,8 +14,10 @@ app.use(connectLogger(accessLogger, { level: 'auto' }));
 
 app.use(express.static(path.resolve(__dirname, '../public')));
 
-app.listen(5001, () => {
-  sysLogger.info('Start on port 5001.');
+// Factor III (Config): 待受ポートは環境変数 PORT で上書き可能 (デフォルト 5001)
+const port = Number(process.env.PORT) || 5001;
+const server = app.listen(port, () => {
+  sysLogger.info(`Start on port ${port}.`);
 });
 
 const db = new sqlite3.Database('ejdict.sqlite3');
@@ -50,3 +52,15 @@ app.get('/api/search-word', (req: express.Request, res: express.Response) => {
 app.get('*', (req, res) => {
   res.sendFile(path.join(path.resolve(__dirname, '../public/index.html')));
 });
+
+// Factor IX (Disposability): SIGTERM/SIGINT で graceful shutdown する
+const shutdown = (signal: string) => {
+  sysLogger.info(`Received ${signal}. Shutting down...`);
+  server.close(() => {
+    db.close(() => {
+      process.exit(0);
+    });
+  });
+};
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
