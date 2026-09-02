@@ -1,14 +1,13 @@
-# Node 14 のままコンテナ化 (Node 更新は別 issue)。
 # sqlite3 がネイティブモジュールのため、build ステージでコンパイルし
 # prune した node_modules ごと本番ステージへコピーする。
-FROM node:14-bullseye AS build
+FROM node:22-bookworm AS build
 WORKDIR /src
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build && npm prune --production
+RUN npm run build && npm prune --omit=dev
 
-FROM node:14-bullseye-slim
+FROM node:22-bookworm-slim
 ENV NODE_ENV=production TZ=Asia/Tokyo
 WORKDIR /app
 COPY --from=build /src/node_modules ./node_modules

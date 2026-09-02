@@ -1,4 +1,4 @@
-# client / server のテストを本番ランタイムと同じ Node 14 で実行する。
+# client / server のテストを本番ランタイムと同じ Node 22 で実行する。
 # Node 更新時はここに新バージョンの列を追加し、両方緑になったら切り替える。
 name: Node.js CI
 
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x, 22.x]
+        node-version: [22.x]
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x, 22.x]
+        node-version: [22.x]
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
