@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":timezone(Asia/Tokyo)"],
+  "schedule": ["before 7am on saturday"],
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 3,
+  "labels": ["renovate"],
+  "packageRules": [
+    {
+      "description": "Node のメジャー更新 (ベースイメージ / engines) はアプリ側の判断で実施するため Renovate では保留",
+      "matchPackageNames": ["node"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "minor/patch は週 1 でまとめて 1 PR に",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "minor-and-patch"
+    }
+  ]
+}
