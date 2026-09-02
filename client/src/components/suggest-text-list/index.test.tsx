@@ -6,7 +6,7 @@ import SuggestTextList from './index';
 
 // docs/use-cases.md N3 (全 26 シフト表示) の画面側の証明
 
-describe('SuggestTextList', () => {
+describe('UT-04 SuggestTextList', () => {
   test('N3: 入力があるとき、ずらし量 0〜25 の全 26 行を表示する', () => {
     render(<SuggestTextList inputText="RQH" />);
     // ヘッダ行 + 26 候補行

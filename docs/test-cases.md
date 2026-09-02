@@ -42,14 +42,15 @@
 | UT-03 | 入力正規化 (showAnalyzeText) | 先頭連続英字のみ抽出・大文字化 | client `pages/home/index.test.tsx`（コンポーネント経由） | 済（#4 の挙動変更時にユニット分離を検討） |
 | UT-04 | SuggestTextList | 26 行表示・ずらし量と行の対応・空入力時は非表示 | client `components/suggest-text-list/index.test.tsx` | 済 |
 | UT-05 | SuggestWordList | null/0 件/ヒットありの 3 状態の表示 | client `components/suggest-word-list/index.test.tsx` | 済 |
-| UT-06 | ImageKeyboard | 各ボタンが正しい文字でコールバックを呼ぶ・BackSpace | — | **未**（関数カバレッジ 33%。#13） |
-| UT-07 | logger | ロガー設定の妥当性 | — | **未**（#7 の stdout 化とあわせて設計。#13） |
+| UT-06 | ImageKeyboard | 全 26 ボタンが対応する大文字でコールバックを呼ぶ・BackSpace・記号画像の表示 | client `components/image-keyboard/index.test.tsx` | 済 |
+| UT-07 | logger | ログが stdout へ出力されること（Factor XI の契約） | server `src/logger.test.ts` | 済 |
 | UT-08 | API の SQL エラーパス | エラー時の応答 | — | **未**（現状は応答が返らない仕様。#3 の実装時にテスト追加） |
 
 ## 4. テスト目標
 
-- **コアロジック（analyse-sentense）: カバレッジ 100% を維持**（現状 100%）
-- **client 全体: statements 95% 以上を維持**(現状 99.37%)
-- server はユニットテスト拡充（UT-06〜08）後に数値目標を設定する
-- カバレッジの CI ゲート化（jest coverageThreshold）は **#13（Node 22 化後のユニットテスト拡充）で導入**する。それまでは本書の数値を目視基準とする
+- **カバレッジは CI でゲート済み**（jest coverageThreshold、#13 で導入）:
+  - コアロジック（server の analyse-sentense）: **100%**（statements/branches/functions/lines）
+  - client / server とも global: statements 95 / lines 95 / functions 90 / branches 80
+- テスト名には本書の ID（UCT-xx / UT-xx）を describe/test 名に併記する（#13 で付与済み）
 - 運用ルール: **挙動を変更する PR は対応するテスト更新を伴う。新規ロジックはテスト同伴**。仕様変更時は use-cases.md → 本書 → テストコードの順に更新する
+- 補足: server の index.ts（HTTP 層）はブラックボックス API テストで検証しており、カバレッジ集計には現れない（子プロセス起動のため）

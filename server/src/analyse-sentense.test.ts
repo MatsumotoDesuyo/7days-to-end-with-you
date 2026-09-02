@@ -4,7 +4,7 @@ import AnalyseSentense from './analyse-sentense';
 // 同じ characterization テストを両方に置いて挙動の一致を保証する。
 // (一本化は依存更新後の課題。docs/use-cases.md §4 N1/N2/N3 参照)
 
-describe('N3: 候補は常に全 26 シフト分', () => {
+describe('UT-02 N3: 候補は常に全 26 シフト分', () => {
   test('1 文字でも複数文字でも 26 通り返す', () => {
     expect(AnalyseSentense('A')).toHaveLength(26);
     expect(AnalyseSentense('DOG')).toHaveLength(26);
@@ -15,7 +15,7 @@ describe('N3: 候補は常に全 26 シフト分', () => {
   });
 });
 
-describe('N1: Z をスキップする 25 文字周期 (ゲーム仕様)', () => {
+describe('UT-02 N1: Z をスキップする 25 文字周期 (ゲーム仕様)', () => {
   test('Y の 1 ずらしは Z ではなく A になる', () => {
     expect(AnalyseSentense('Y')[1]).toBe('A');
   });
@@ -32,7 +32,7 @@ describe('N1: Z をスキップする 25 文字周期 (ゲーム仕様)', () => 
   });
 });
 
-describe('N2: 入力が Z の文字だけは mod 26 (現行挙動の固定)', () => {
+describe('UT-02 N2: 入力が Z の文字だけは mod 26 (現行挙動の固定)', () => {
   test('Z のずらし 0 は Z、ずらし 1 は A', () => {
     const candidates = AnalyseSentense('Z');
     expect(candidates[0]).toBe('Z');

@@ -25,6 +25,18 @@ export default {
   // The directory where Jest should output its coverage files
   coverageDirectory: 'coverage',
 
+  // docs/test-cases.md §4 のテスト目標 (#13 でゲート化)。
+  // コアロジック (analyse-sentense) は 100% を維持する
+  coverageThreshold: {
+    global: { statements: 95, lines: 95, functions: 90, branches: 80 },
+    './src/analyse-sentense.ts': {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
+  },
+
   // An array of regexp pattern strings used to skip coverage collection
   // coveragePathIgnorePatterns: [
   //   "\\\\node_modules\\\\"

@@ -63,7 +63,7 @@ afterAll(() => {
 });
 
 describe('GET /api/search-word', () => {
-  test('N9/UC3: 実ゲームの暗号単語 RQH で one が意味つきでヒットする', async () => {
+  test('UCT-03/N9: 実ゲームの暗号単語 RQH で one が意味つきでヒットする', async () => {
     const res = await get('/api/search-word?word=RQH');
     expect(res.status).toBe(200);
     const rows: { word: string; mean: string }[] = JSON.parse(res.body);
@@ -82,19 +82,19 @@ describe('GET /api/search-word', () => {
     });
   });
 
-  test('N5: ヒット件数は 100 件以下', async () => {
+  test('UCT-07/N5: ヒット件数は 100 件以下', async () => {
     const res = await get('/api/search-word?word=RQH');
     const rows: unknown[] = JSON.parse(res.body);
     expect(rows.length).toBeLessThanOrEqual(100);
   });
 
-  test('N8: word パラメータなしは空応答 (サーバーは落ちない)', async () => {
+  test('UCT-06/N8: word パラメータなしは空応答 (サーバーは落ちない)', async () => {
     const res = await get('/api/search-word');
     expect(res.status).toBe(200);
     expect(res.body).toBe('');
   });
 
-  test('N8: word が空文字でも空応答 (サーバーは落ちない)', async () => {
+  test('UCT-06/N8: word が空文字でも空応答 (サーバーは落ちない)', async () => {
     const res = await get('/api/search-word?word=');
     expect(res.status).toBe(200);
     expect(res.body).toBe('');

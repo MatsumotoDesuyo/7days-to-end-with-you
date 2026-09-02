@@ -6,7 +6,7 @@ import SuggestWordList from './index';
 
 // docs/use-cases.md UC3 (辞書検索の表示) の証明
 
-describe('SuggestWordList', () => {
+describe('UT-05 SuggestWordList', () => {
   test('未検索 (null) のときは何も表示しない', () => {
     render(<SuggestWordList wordMeans={null} />);
     expect(screen.queryAllByRole('row')).toHaveLength(0);

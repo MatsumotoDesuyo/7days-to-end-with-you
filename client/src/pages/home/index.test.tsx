@@ -18,7 +18,7 @@ function typeText(value: string): void {
   fireEvent.change(textbox(), { target: { value } });
 }
 
-describe('UC2/N7: テキスト欄への直接入力', () => {
+describe('UCT-02 テキスト欄への直接入力 (UC2/N7)', () => {
   test('英字入力は大文字化されて反映され、候補が表示される', () => {
     render(<Home />);
     typeText('dog');
@@ -43,7 +43,7 @@ describe('UC2/N7: テキスト欄への直接入力', () => {
   });
 });
 
-describe('UC1/UC4: 記号ボタンでの入力と修正', () => {
+describe('UCT-01/UCT-05 記号ボタンでの入力と修正 (UC1/UC4)', () => {
   test('UC1: ボタン入力が連結されて反映される', () => {
     render(<Home />);
     fireEvent.click(screen.getByRole('button', { name: 'D' }));
@@ -60,7 +60,7 @@ describe('UC1/UC4: 記号ボタンでの入力と修正', () => {
   });
 });
 
-describe('UC3: 辞書検索', () => {
+describe('UCT-03 辞書検索 (UC3)', () => {
   test('検索結果が意味つきで表示され、API には入力中の単語が送られる', async () => {
     mockedAxios.get.mockResolvedValue({
       data: [{ word: 'one', mean: '一つの' }],
@@ -92,7 +92,7 @@ describe('UC3: 辞書検索', () => {
   });
 });
 
-describe('N4: 表示順', () => {
+describe('UCT-03 表示順 (N4)', () => {
   test('辞書ヒットの表はシフト候補の表より上に表示される', async () => {
     mockedAxios.get.mockResolvedValue({
       data: [{ word: 'one', mean: '一つの' }],
