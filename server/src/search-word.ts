@@ -27,21 +27,34 @@ export default function createSearchWordHandler(
         if (i !== 0) questions += ',';
         questions += '?';
       }
-      const stmt = db.prepare(
-        `select word,mean from items WHERE word IN(${questions}) limit 100`
-      );
+      // #3 (N8): エラー時にも必ず応答を返す (クライアントをハングさせない)
+      // #14: ハンドリング済みエラーも Sentry へ emit (未初期化時は no-op)
+      const respondError = (err: Error) => {
+        sysLogger.error('search-word failed', err);
+        Sentry.captureException(err);
+        res.status(500).send(JSON.stringify([]));
+      };
 
-      stmt.all(strs, (err, rows) => {
-        if (err) {
-          // #3 (N8): エラー時にも必ず応答を返す (クライアントをハングさせない)
-          // #14: ハンドリング済みエラーも Sentry へ emit (未初期化時は no-op)
-          sysLogger.error('search-word failed', err);
-          Sentry.captureException(err);
-          res.status(500).send(JSON.stringify([]));
-          return;
+      // prepare 段階のエラー (辞書破損による no such table 等) はコールバックを
+      // 渡さないと 'error' イベント → uncaughtException でプロセスが落ちる
+      // (Sentry 実打検証 7DAYS-SERVER-2 で発覚した挙動)。コールバックで受けて
+      // 実行時エラーと同じく 500 に畳む
+      const stmt = db.prepare(
+        `select word,mean from items WHERE word IN(${questions}) limit 100`,
+        (prepareErr: Error | null) => {
+          if (prepareErr) {
+            respondError(prepareErr);
+            return;
+          }
+          stmt.all(strs, (err, rows) => {
+            if (err) {
+              respondError(err);
+              return;
+            }
+            res.send(JSON.stringify(rows));
+          });
         }
-        res.send(JSON.stringify(rows));
-      });
+      );
     });
   };
 }
