@@ -34,4 +34,5 @@
 
 - ポート: 環境変数 `PORT` (デフォルト 5001) / ログ: stdout のみ / SIGTERM・SIGINT で graceful shutdown
 - エラーは Sentry へ emit (#14)。`SENTRY_DSN` / `SENTRY_ENVIRONMENT` / `SENTRY_RELEASE` は platform が注入し、未設定時 (ローカル・CI) は無効。参照は sentry-ro MCP (org: howel, project: 7days-server)
+- 障害調査・エラー確認は、人に telemetry を貼ってもらう前に **sentry-ro (errors) / grafana-ro (logs・metrics) の MCP でまず自律的に行う** (DEPLOYMENT.md「可視性」)。日常エラーは Discord に通知されないため能動確認が前提
 - 運用への要望・契約変更はこのリポジトリの Issue に起票する
