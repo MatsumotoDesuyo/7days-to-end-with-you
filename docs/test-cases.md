@@ -44,7 +44,7 @@
 | UT-05 | SuggestWordList | null/0 件/ヒットありの 3 状態の表示 | client `components/suggest-word-list/index.test.tsx` | 済 |
 | UT-06 | ImageKeyboard | 全 26 ボタンが対応する大文字でコールバックを呼ぶ・BackSpace・記号画像の表示 | client `components/image-keyboard/index.test.tsx` | 済 |
 | UT-07 | logger | ログが stdout へ出力されること（Factor XI の契約） | server `src/logger.test.ts` | 済 |
-| UT-08 | API の SQL エラーパス | エラー時の応答 | — | **未**（現状は応答が返らない仕様。#3 の実装時にテスト追加） |
+| UT-08 | search-word ハンドラ | SQL エラー時に 500 + 空配列で必ず応答する。成功時は候補 26 件（小文字）で照会しヒット行を返す | server `src/search-word.test.ts`（db 注入のファクトリ化により単体検証） | 済（#3） |
 
 ## 4. テスト目標
 
