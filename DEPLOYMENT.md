@@ -30,7 +30,7 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 - telemetry は単一の共有プレーンに集約され、platform とアプリの双方が (自サービスのスライスを) 読める。コピーを分けない。
 - 他アプリのデータ・platform の秘密は隔離される (最小権限)。
 - 閲覧先 (共有プレーン): logs / metrics は **Grafana** https://maroonkinkajou2355.grafana.net (Explore またはダッシュボード、`service=<name>` で絞り込む)。errors は **Sentry** https://howel.sentry.io (project = サービス名)。
-- **アプリ側のエージェントは、このリポジトリの `.mcp.json` に定義された read-only MCP で上記を直接読める**: `grafana-ro` (logs / metrics)、`sentry-ro` (errors)。自サービスの障害調査・エラー確認はまず両 MCP で自律的に行い、人に telemetry を貼ってもらう前提にしない。書き込み権限はなく、他サービスの秘密には届かない。
+- **アプリ側のエージェントは、このリポジトリに `.mcp.json` が提供されている場合、そこに定義された read-only MCP で上記を直接読める**: `grafana-ro` (logs / metrics)、`sentry-ro` (errors)。自サービスの障害調査・エラー確認はまず両 MCP で自律的に行い、人に telemetry を貼ってもらう前提にしない。書き込み権限はなく、他サービスの秘密には届かない。
 - platform が Discord に通知するのは閾値を超えたエラー (regression / 急増) だけで、日常のエラーは通知されない。よって自サービスのエラーは `sentry-ro` で能動的に確認する。
 
 ## 導出ルール
@@ -45,7 +45,7 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 
 build と release/run の境界は不変アーティファクトである (Factor V)。アプリは *build* を所有し、生成したアーティファクトの identity を platform に渡す。release と run (どこへ・どう配置するか) は platform が実行し、アプリはそれを知らない・触らない (ホストへの SSH も配置先の知識も持たない)。
 
-- アプリは不変タグ `sha-<gitsha>` でイメージを push し (floating タグに依存しない)、build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
+- アプリはイメージに**不変のタグ**を付けて push する。タグはソースのリビジョン (git SHA) から一意に導かれ、再利用・再 push しない (floating タグ `latest` / `server` は release ではない)。現行の導出形式は `<role>-<shortsha>` (例 `server-3f2a1c9`。role は同一リポジトリから複数イメージを出す場合の区別)。build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
 - platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。
 - **リリース履歴の正本は platform 側の台帳 (Git)** であり、ロールバックはその revert である。
 - 根拠と機構は ADR 0008。
