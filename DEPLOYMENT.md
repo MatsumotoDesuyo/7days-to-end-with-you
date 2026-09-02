@@ -34,7 +34,7 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 - 閲覧先 (共有プレーン): logs / metrics は **Grafana** https://maroonkinkajou2355.grafana.net (Explore またはダッシュボード、`service=<name>` で絞り込む)。errors は **Sentry** https://howel.sentry.io (project = サービス名)。
 - **アプリ側のエージェントは、このリポジトリに `.mcp.json` が提供されている場合、そこに定義された read-only MCP で上記を直接読める**: `grafana-ro` (logs / metrics)、`sentry-ro` (errors)。自サービスの障害調査・エラー確認はまず両 MCP で自律的に行い、人に telemetry を貼ってもらう前提にしない。書き込み権限はなく、他サービスの秘密には届かない。
 - platform が Discord (#alerts) に通知するのは閾値を超えたものだけ: 基盤は Grafana Alerting (メモリ余裕・CPU・再起動ループ)、アプリは Sentry の regression / 急増。日常のエラーは通知されないため、自サービスのエラーは `sentry-ro` で能動的に確認する。
-- ローカル / 開発環境の Sentry: DSN は本番と同一 (project 単位) で、区別は `SENTRY_ENVIRONMENT` で行う (platform が run するものは `prod`、ローカルは `dev`)。platform の通知は `prod` の event だけを対象にするので、ローカルのエラーで #alerts は鳴らない。ローカルは既定で `SENTRY_DSN` 未設定 (SDK 無効) とし、SDK の配線を確かめたいときだけ設定する (無料枠は org 全体で共有のため)。
+- ローカル / 開発環境の Sentry: DSN は本番と同一 (project 単位) で、区別は `SENTRY_ENVIRONMENT` で行う (platform が run するものは `prod`、ローカルは `dev`)。platform の通知は `prod` の event だけを対象にするので、ローカルのエラーで #alerts は鳴らない。ローカルは既定で `SENTRY_DSN` 未設定 (SDK 無効) とし、SDK の配線を確かめたいときだけ設定する (無料枠は org 全体で共有のため)。DSN の値は `sentry-ro` (自分の project の Client Keys) で自分で参照できる。platform に問い合わせる必要はない。
 
 ## 導出ルール
 
