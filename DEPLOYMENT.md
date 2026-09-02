@@ -29,7 +29,9 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 - アプリはログを stdout にイベントとして出し (Factor XI)、telemetry は OpenTelemetry 形式で emit する。全 signal に `service=<name>` を付ける。
 - telemetry は単一の共有プレーンに集約され、platform とアプリの双方が (自サービスのスライスを) 読める。コピーを分けない。
 - 他アプリのデータ・platform の秘密は隔離される (最小権限)。
-- 閲覧は共有 observability プレーン **Grafana** で行う: https://maroonkinkajou2355.grafana.net (Explore またはダッシュボード)。自分のサービスは `service=<name>` で絞り込む。
+- 閲覧先 (共有プレーン): logs / metrics は **Grafana** https://maroonkinkajou2355.grafana.net (Explore またはダッシュボード、`service=<name>` で絞り込む)。errors は **Sentry** https://howel.sentry.io (project = サービス名)。
+- **アプリ側のエージェントは、このリポジトリの `.mcp.json` に定義された read-only MCP で上記を直接読める**: `grafana-ro` (logs / metrics)、`sentry-ro` (errors)。自サービスの障害調査・エラー確認はまず両 MCP で自律的に行い、人に telemetry を貼ってもらう前提にしない。書き込み権限はなく、他サービスの秘密には届かない。
+- platform が Discord に通知するのは閾値を超えたエラー (regression / 急増) だけで、日常のエラーは通知されない。よって自サービスのエラーは `sentry-ro` で能動的に確認する。
 
 ## 導出ルール
 
