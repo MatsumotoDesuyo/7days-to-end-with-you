@@ -6,7 +6,7 @@ import {
   TableRow,
   TableBody,
 } from '@mui/material';
-import AnalyseSentense from '../../common/analyse-sentense';
+import { AnalyseSentense } from 'shared';
 
 type Props = {
   inputText: string;

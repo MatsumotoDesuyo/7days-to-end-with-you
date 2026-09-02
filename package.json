@@ -1,0 +1,25 @@
+{
+  "name": "7days-to-end-with-you",
+  "version": "1.0.0",
+  "private": true,
+  "description": "7 Days to End with You 解読補助ツール (モノレポルート)",
+  "author": "MatsumotoDesuyo",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MatsumotoDesuyo/7days-to-end-with-you.git"
+  },
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
+    "pretest": "npm run build -w shared",
+    "test": "npm run test -w shared && npm run test -w server && npm run test -w client",
+    "lint": "npm run lint -ws",
+    "dev:server": "npm run start -w server",
+    "dev:client": "npm run dev -w client"
+  }
+}

@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import { Button, Stack, TextField, Typography, Grid, Box } from '@mui/material';
-import './index.scss';
+import './index.css';
 import axios from 'axios';
 import Footer from '../../components/footer';
 import SuggestTextList from '../../components/suggest-text-list';

@@ -1,6 +1,6 @@
 import express from 'express';
 import sqlite3 from 'sqlite3';
-import AnalyseSentense from './analyse-sentense';
+import { AnalyseSentense } from 'shared';
 import { sysLogger } from './logger';
 
 // UC3: 辞書検索。全シフト候補のうち辞書に存在する単語を意味つきで返す。

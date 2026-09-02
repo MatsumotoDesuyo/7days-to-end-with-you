@@ -1,26 +1,11 @@
 {
-  "name": "7days-to-end-with-you-server",
+  "name": "server",
   "version": "0.1.10",
-  "description": "7days to end with you解読補助ツール",
-  "author": "MatsumotoDesuyo",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MatsumotoDesuyo/7days-to-end-with-you.git"
-  },
-  "main": "dist/exports.js",
-  "types": "dist/exports.d.ts",
-  "files": [
-    "package-lock.json",
-    "/src",
-    "!/src/*.test.ts",
-    "!/src/*.test.tsx",
-    "!/src/__snapshots__",
-    "/dist"
-  ],
+  "private": true,
+  "description": "7days to end with you 解読補助ツール (server)",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "test": "jest",
+    "test": "vitest run",
     "lint": "eslint .",
     "clean": "rimraf dist/*",
     "build": "npm run clean && tsc && cpx -C ejdict.sqlite3 ./dist"
@@ -29,25 +14,25 @@
     "cpx": "^1.5.0",
     "express": "^4.17.1",
     "log4js": "^6.3.0",
+    "shared": "*",
     "sqlite3": "^5.0.8",
     "rimraf": "^3.0.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/express": "^4.17.13",
-    "@types/jest": "^29.5.12",
     "@types/log4js": "^2.3.5",
     "@types/node": "^16.3.2",
     "@types/sqlite3": "^3.1.8",
-    "@eslint/js": "^9.0.0",
+    "@vitest/coverage-v8": "^3.0.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.0.0",
-    "typescript-eslint": "^8.0.0",
-    "jest": "^29.7.0",
     "prettier": "^2.3.2",
-    "ts-jest": "^29.2.0",
     "ts-node": "^10.1.0",
     "ts-node-dev": "^1.1.8",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3.0.0"
   }
 }

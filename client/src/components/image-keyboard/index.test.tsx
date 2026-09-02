@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { fireEvent, render, screen } from '@testing-library/react';
 import ImageKeyboard from './index';
 
@@ -8,11 +5,11 @@ import ImageKeyboard from './index';
 
 describe('UT-06 ImageKeyboard', () => {
   test('A〜Z の全 26 ボタンが、対応する大文字でコールバックを呼ぶ', () => {
-    const onInput = jest.fn();
+    const onInput = vi.fn();
     render(
       <ImageKeyboard
         onInputButtonPushedFunc={onInput}
-        onDeleteButtonPushedFunc={jest.fn()}
+        onDeleteButtonPushedFunc={vi.fn()}
       />
     );
     const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -23,10 +20,10 @@ describe('UT-06 ImageKeyboard', () => {
   });
 
   test('BackSpace ボタンが削除コールバックを呼ぶ', () => {
-    const onDelete = jest.fn();
+    const onDelete = vi.fn();
     render(
       <ImageKeyboard
-        onInputButtonPushedFunc={jest.fn()}
+        onInputButtonPushedFunc={vi.fn()}
         onDeleteButtonPushedFunc={onDelete}
       />
     );
@@ -37,8 +34,8 @@ describe('UT-06 ImageKeyboard', () => {
   test('各ボタンにはゲーム内記号の画像が表示される', () => {
     render(
       <ImageKeyboard
-        onInputButtonPushedFunc={jest.fn()}
-        onDeleteButtonPushedFunc={jest.fn()}
+        onInputButtonPushedFunc={vi.fn()}
+        onDeleteButtonPushedFunc={vi.fn()}
       />
     );
     const images = screen.getAllByRole('img');

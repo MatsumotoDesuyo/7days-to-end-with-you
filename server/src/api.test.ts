@@ -1,7 +1,7 @@
 import { spawn, ChildProcess } from 'child_process';
 import http from 'http';
 import path from 'path';
-import AnalyseSentense from './analyse-sentense';
+import { AnalyseSentense } from 'shared';
 
 // docs/use-cases.md の UC3 と N5/N8/N9 のサーバー側の証明。
 // 実サーバーを子プロセスとして起動し、同梱の実辞書 (ejdict.sqlite3) に

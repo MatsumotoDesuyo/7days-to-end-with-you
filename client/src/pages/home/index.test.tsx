@@ -1,14 +1,12 @@
-/**
- * @jest-environment jsdom
- */
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import type { Mocked } from 'vitest';
 import axios from 'axios';
 import Home from './index';
 
 // docs/use-cases.md の UC1/UC2/UC4 と N4/N7 の画面側の証明
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
 
 function textbox(): HTMLInputElement {
   return screen.getByRole('textbox') as HTMLInputElement;

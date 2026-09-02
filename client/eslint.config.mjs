@@ -18,7 +18,7 @@ export default tseslint.config(
   prettier,
   {
     languageOptions: {
-      globals: { ...globals.browser, ...globals.node, ...globals.jest },
+      globals: { ...globals.browser, ...globals.node, ...globals.vitest },
     },
     settings: { react: { version: 'detect' } },
     rules: {

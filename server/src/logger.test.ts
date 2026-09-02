@@ -1,22 +1,20 @@
 // docs/test-cases.md UT-07: ログが stdout へ出力されること (Factor XI / #7)
 
 describe('UT-07 logger', () => {
-  test('ロガーは stdout へ出力する', () => {
+  test('ロガーは stdout へ出力する', async () => {
     const outputs: string[] = [];
-    const write = jest
+    const write = vi
       .spyOn(process.stdout, 'write')
       .mockImplementation((chunk) => {
         outputs.push(String(chunk));
         return true;
       });
     try {
-      jest.isolateModules(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { sysLogger, appLogger, accessLogger } = require('./logger');
-        sysLogger.info('stdout-check-system');
-        appLogger.info('stdout-check-application');
-        accessLogger.info('stdout-check-access');
-      });
+      vi.resetModules();
+      const { sysLogger, appLogger, accessLogger } = await import('./logger');
+      sysLogger.info('stdout-check-system');
+      appLogger.info('stdout-check-application');
+      accessLogger.info('stdout-check-access');
     } finally {
       write.mockRestore();
     }

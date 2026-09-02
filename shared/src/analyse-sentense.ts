@@ -1,3 +1,6 @@
+// シーザーシフト解析のコアロジック (client/server 共通)。
+// シフトは Z をスキップする 25 文字周期 (Y の次が A) がゲーム仕様。
+// 入力が Z の文字だけは mod 26 で変換する。docs/game-overview.md §3 参照。
 function toAlphabet(orgNum: number, moveNum: number): string {
   let num = orgNum + moveNum;
   if (orgNum === 25) {

@@ -1,0 +1,13 @@
+{
+  "name": "shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "client/server 共通のコアロジック (シーザーシフト解析)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "eslint ."
+  }
+}

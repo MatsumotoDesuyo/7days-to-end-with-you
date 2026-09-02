@@ -1,0 +1,11 @@
+.git
+voice_memos
+node_modules
+*/node_modules
+*/dist
+*/coverage
+server/public
+server/logs
+Dockerfile
+.dockerignore
+.github
