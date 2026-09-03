@@ -27,7 +27,7 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 責任 (所有) と可視性は別の軸である。**収集の機構は platform が所有するが、telemetry (logs / metrics / traces / errors) は両者が読める。**
 
 - アプリの基本義務は、ログを stdout にイベントとして出すこと (Factor XI) と、全 signal に `service=<name>` が付くこと。コンテナ単位の CPU / メモリと stdout ログは platform が **SDK なしで**収集する (cAdvisor / Alloy)。
-- 信号は発生源で二分する (ADR 0010)。**基盤の信号** (host / コンテナの CPU・メモリ・ディスク・再起動、stdout ログ) は platform が Grafana で収集・判定・通知し、アプリに義務はない。**アプリの信号** (errors、リクエスト数・応答時間・エラー率、traces) はアプリが **Sentry SDK** (performance / tracing 有効) で emit する。platform は OTLP 等の受け口を持たず、アプリの metrics / traces は Sentry に集約する。SDK は数十 MB のメモリを使うため、規模の小さいサービスは platform と合意の上で省略できる (例外はサービスごとに明示する)。
+- 信号は発生源で二分する。**基盤の信号** (host / コンテナの CPU・メモリ・ディスク・再起動、stdout ログ) は platform が Grafana で収集・判定・通知し、アプリに義務はない。**アプリの信号** (errors、リクエスト数・応答時間・エラー率、traces) はアプリが **Sentry SDK** (performance / tracing 有効) で emit する。platform は OTLP 等の受け口を持たず、アプリの metrics / traces は Sentry に集約する。SDK は数十 MB のメモリを使うため、規模の小さいサービスは platform と合意の上で省略できる (例外はサービスごとに明示する)。
 - telemetry は単一の共有プレーンに集約され、platform とアプリの双方が (自サービスのスライスを) 読める。コピーを分けない。
 - 他アプリのデータ・platform の秘密は隔離される (最小権限)。
 - 資源の実使用は同じプレーンで読める: サービス別 CPU / メモリはダッシュボード `my-server-overview`、または `container_memory_working_set_bytes{service=<name>}` / `rate(container_cpu_usage_seconds_total{service=<name>}[5m])`。host 全体の容量と余裕は `node_memory_MemTotal_bytes` / `node_memory_MemAvailable_bytes`。現在、サービス別の上限は設けておらず host の余裕を共有している。上限を設ける場合は platform が宣言する。
@@ -51,11 +51,10 @@ build と release/run の境界は不変アーティファクトである (Facto
 - アプリはイメージに**不変のタグ**を付けて push する。タグはソースのリビジョン (git SHA) から一意に導かれ、再利用・再 push しない (floating タグ `latest` / `server` は release ではない)。現行の導出形式は `<role>-<shortsha>` (例 `server-3f2a1c9`。role は同一リポジトリから複数イメージを出す場合の区別)。build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
 - platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。
 - **リリース履歴の正本は platform 側の台帳 (Git)** であり、ロールバックはその revert である。
-- 根拠と機構は ADR 0008。
 
 ## 組織 (ドメイン横断の資産)
 
-アプリと platform の他に、**組織** (soncho-works.com の所有者) という第三の役者がいる (ADR 0011)。
+アプリと platform の他に、**組織** (soncho-works.com の所有者) という第三の役者がいる。
 
 - **組織が所有**: ドメインと命名、メール、SaaS テナント (契約・課金・ログイン)、収益と法務 (AdSense アカウント・pub-ID・root の `ads.txt`・CMP/同意設定・privacy policy)、計測のアカウント (GA4 のアカウント)。
 - **アプリが所有**: その資産を使うか、どこでどう使うか (広告の有無と配置、GA4 のプロパティ/タグ)。組織が発行した ID / スニペットを組み込む。**組織資産の正本をアプリに置かない**。
