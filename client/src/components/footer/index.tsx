@@ -3,7 +3,7 @@ import './index.css';
 export default function Footer() {
   return (
     <div className="footer">
-      ©2022 watashihamatsumotodes@gmail.com
+      ©2022 watashihamatsumotodesu@gmail.com
       {' ・ '}
       <a href="/privacy.html" style={{ color: 'inherit' }}>
         Privacy Policy
