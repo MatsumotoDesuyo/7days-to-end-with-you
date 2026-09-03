@@ -16,6 +16,7 @@ import Footer from '../../components/footer';
 import SuggestTextList from '../../components/suggest-text-list';
 import SuggestWordList, { WordMean } from '../../components/suggest-word-list';
 import ImageKeyboard from '../../components/image-keyboard';
+import AdUnit from '../../components/ad-unit';
 import { LANG_OPTIONS, useI18n } from '../../i18n';
 import type { Lang } from '../../i18n';
 import { trackLanguageChange, trackSearch } from '../../ga';
@@ -135,6 +136,7 @@ export default function Home() {
             <br />
             {t('aboutHandicap3')}
           </Typography>
+          <AdUnit />
         </Stack>
       </Stack>
       <Footer />

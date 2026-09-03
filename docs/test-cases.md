@@ -50,6 +50,7 @@
 | UT-09 | 初期言語の解決 (resolveInitialLang) | 保存済み選択が最優先、なければブラウザ言語（対応言語に前方一致、なければ en） | client `src/i18n.test.ts` | 済（#2） |
 | UT-10 | Sentry 初期化 (instrument) | `SENTRY_DSN` 未設定なら init しない。設定時は dsn/environment/release + tracing (tracesSampleRate) で init する | server `src/instrument.test.ts` | 済（#14） |
 | UT-11 | GA 初期化・イベント (ga) | 本番ビルド以外・ID 空では何もしない。本番では consent デフォルト（EEA/UK/CH 拒否）→ config の順で初期化し gtag スクリプトをロード。イベントは初期化後のみ `dict_search`/`language_change` を送信 | client `src/ga.test.ts` | 済（#12） |
+| UT-12 | 広告ユニット (AdUnit) | 本番以外では実広告をロードせず高さのみ確保。本番では正しい client/slot 属性の 1 ユニットを描画し adsbygoogle に 1 回 push。高さ予約で CLS を防ぐ | client `components/ad-unit/index.test.tsx` | 済（#12） |
 
 ## 4. テスト目標
 
