@@ -18,6 +18,7 @@ import SuggestWordList, { WordMean } from '../../components/suggest-word-list';
 import ImageKeyboard from '../../components/image-keyboard';
 import { LANG_OPTIONS, useI18n } from '../../i18n';
 import type { Lang } from '../../i18n';
+import { trackLanguageChange, trackSearch } from '../../ga';
 
 export default function Home() {
   const [inputText, setInputText] = useState('');
@@ -39,6 +40,7 @@ export default function Home() {
       params: { word: inputText, lang },
     });
     setWordMeans(data);
+    trackSearch(lang);
   };
 
   return (
@@ -51,7 +53,9 @@ export default function Home() {
               size="small"
               inputProps={{ 'aria-label': 'language' }}
               onChange={(event) => {
-                setLang(event.target.value as Lang);
+                const next = event.target.value as Lang;
+                setLang(next);
+                trackLanguageChange(next);
               }}
             >
               {LANG_OPTIONS.map((option) => (

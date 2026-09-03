@@ -13,20 +13,7 @@
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9666515152781934"
       crossorigin="anonymous"
     ></script>
-    <!-- 旧 gtag。扱いは GA 再設計 (#12) で決める -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-VSBH50F0ZG"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-
-      gtag('config', 'G-VSBH50F0ZG');
-    </script>
+    <!-- GA4 は src/ga.ts で初期化する (本番ビルドのみ。docs/use-cases.md N11) -->
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

@@ -1,11 +1,14 @@
 # 7days-to-end-with-you
 
-『7 Days to End with You』の暗号解読補助ツール。詳細は docs/ を必ず参照:
+『7 Days to End with You』の暗号解読補助ツール。
+**本番: https://7days-to-decode.soncho-works.com/**
+詳細は docs/ を必ず参照:
 
 - [docs/use-cases.md](docs/use-cases.md) — 何が「正常」か (N1-N9)。仕様変更はまずここから
 - [docs/test-cases.md](docs/test-cases.md) — テストの層 (UCT/UT) と目標。テスト名の ID はここと対応
 - [docs/game-overview.md](docs/game-overview.md) — ゲーム自体の仕様 (Z スキップの 25 文字周期など)。Web を再調査しないこと
 - [DEPLOYMENT.md](DEPLOYMENT.md) — platform との契約 (Twelve-Factor)。**このファイルは編集禁止** (platform 管理の複製)
+- [docs/ops.md](docs/ops.md) — アプリ側管轄の外部リソース台帳 (GA / GCP / AdSense)
 
 ## 構成 (npm workspaces)
 
