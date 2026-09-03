@@ -34,8 +34,11 @@
 - パブリッシャー ID: `ca-pub-9666515152781934` (client/index.html。発行元は組織)
 - 広告ユニット: 手動 1 ユニットのみ (スロット `8476370284`、components/ad-unit)。
   自動広告は `soncho-works.com` ドメイン単位でオフ済み (2026-09-03)
-- プライバシーポリシー (アプリ詳細分): https://7days-to-decode.soncho-works.com/privacy.html
-  (正本: client/public/privacy.html)
+- プライバシーポリシー: 正本は**組織**の汎用版 https://soncho-works.com/privacy/ (#37)。
+  フッターの "Privacy Policy" はここを指す。アプリ側の
+  `client/public/privacy.html` は、汎用版にない固有の取り扱い
+  (表示言語の localStorage 保存) だけを書いた**補足ページ**
+  (フッターの "Supplement")。本文の変更が必要なら `to-org` で依頼する
 - **ads.txt**: 正本は組織 (my-server の `org/ads.txt`) に移管済み (#36、2026-09)。
   root (`https://soncho-works.com/ads.txt`) で配信中。アプリ側の複製
   (client/public/ads.txt) は役目を終えたため削除した。広告システムの追加等で
