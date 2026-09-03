@@ -46,7 +46,7 @@
 | UT-05 | SuggestWordList | null/0 件/ヒットありの 3 状態の表示 | client `components/suggest-word-list/index.test.tsx` | 済 |
 | UT-06 | ImageKeyboard | 全 26 ボタンが対応する大文字でコールバックを呼ぶ・BackSpace・記号画像の表示 | client `components/image-keyboard/index.test.tsx` | 済 |
 | UT-07 | logger | ログが stdout へ出力されること（Factor XI の契約） | server `src/logger.test.ts` | 済 |
-| UT-08 | search-word ハンドラ | SQL エラー時（prepare 段階・実行段階のどちらでも）に 500 + 空配列で必ず応答し、プロセスは落ちない。成功時は候補 26 件（小文字）で照会しヒット行を返す | server `src/search-word.test.ts`（db 注入のファクトリ化により単体検証） | 済（#3） |
+| UT-08 | search-word ハンドラ | SQL エラー時（prepare 段階・実行段階のどちらでも）に 500 + 空配列で必ず応答し、プロセスは落ちない。成功時は候補 26 件（小文字）で照会しヒット行を返す | server `src/search-word.test.ts`（db 注入のファクトリ化により単体検証。node:sqlite 移行後は同期 API のため、フェイク DB は prepare/all が例外を投げる形で検証する #35） | 済（#3） |
 | UT-09 | 初期言語の解決 (resolveInitialLang) | 保存済み選択が最優先、なければブラウザ言語（対応言語に前方一致、なければ en） | client `src/i18n.test.ts` | 済（#2） |
 | UT-10 | Sentry 初期化 (instrument) | `SENTRY_DSN` 未設定なら init しない。設定時は dsn/environment/release + tracing (tracesSampleRate) で init する | server `src/instrument.test.ts` | 済（#14） |
 | UT-11 | GA 初期化・イベント (ga) | 本番ビルド以外・ID 空では何もしない。本番では consent デフォルト（EEA/UK/CH 拒否）→ config の順で初期化し gtag スクリプトをロード。イベントは初期化後のみ `dict_search`/`language_change` を送信 | client `src/ga.test.ts` | 済（#12） |

@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/node';
 import express from 'express';
 import { connectLogger } from 'log4js';
 import path from 'path';
-import sqlite3 from 'sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import createSearchWordHandler from './search-word';
 import { sysLogger, accessLogger } from './logger';
 
@@ -25,13 +25,14 @@ const server = app.listen(port, () => {
 
 // 言語別辞書 (N10)。ja は従来の ejdict、他言語は scripts/build-dicts.mjs の生成物
 const DICT_LANGS = ['en', 'fr', 'it', 'de', 'es', 'pt', 'zh'];
-const dbs = new Map<string, sqlite3.Database>();
-dbs.set('ja', new sqlite3.Database('ejdict.sqlite3'));
+// 辞書は読み取り専用。node:sqlite (Node 22 組み込み) を使うためネイティブ依存はない
+const dbs = new Map<string, DatabaseSync>();
+dbs.set('ja', new DatabaseSync('ejdict.sqlite3', { readOnly: true }));
 DICT_LANGS.forEach((lang) => {
-  dbs.set(lang, new sqlite3.Database(`dict/${lang}.sqlite3`));
+  dbs.set(lang, new DatabaseSync(`dict/${lang}.sqlite3`, { readOnly: true }));
 });
-const jaDb = dbs.get('ja') as sqlite3.Database;
-const resolveDb = (lang: string): sqlite3.Database => dbs.get(lang) ?? jaDb;
+const jaDb = dbs.get('ja') as DatabaseSync;
+const resolveDb = (lang: string): DatabaseSync => dbs.get(lang) ?? jaDb;
 app.get('/api/search-word', createSearchWordHandler(resolveDb));
 
 // SPA フォールバック。express 5 (path-to-regexp v8) では '*' 単体のルート構文が
@@ -47,13 +48,9 @@ Sentry.setupExpressErrorHandler(app);
 const shutdown = (signal: string) => {
   sysLogger.info(`Received ${signal}. Shutting down...`);
   server.close(() => {
-    let remaining = dbs.size;
-    dbs.forEach((db) => {
-      db.close(() => {
-        remaining -= 1;
-        if (remaining === 0) process.exit(0);
-      });
-    });
+    // node:sqlite の close は同期
+    dbs.forEach((db) => db.close());
+    process.exit(0);
   });
 };
 process.on('SIGTERM', () => shutdown('SIGTERM'));
