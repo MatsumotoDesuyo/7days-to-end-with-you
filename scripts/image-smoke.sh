@@ -31,6 +31,10 @@ echo '===== GET / (SPA) ====='
 curl -fsS "http://localhost:$PORT/" | grep -q '<div id="root">'
 echo 'OK: index.html'
 
+echo '===== GET /任意パス (SPA フォールバック) ====='
+curl -fsS "http://localhost:$PORT/some/client/route" | grep -q '<div id="root">'
+echo 'OK: fallback returns index.html'
+
 echo '===== GET /api/search-word (実辞書) ====='
 body=$(curl -fsS "http://localhost:$PORT/api/search-word?word=RQH&lang=ja")
 echo "$body" | grep -q '"word":"one"'

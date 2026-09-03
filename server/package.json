@@ -13,7 +13,7 @@
   "dependencies": {
     "@sentry/node": "^10.73.0",
     "cpx2": "^2.0.0",
-    "express": "^4.17.1",
+    "express": "^5.0.0",
     "log4js": "^6.3.0",
     "shared": "*",
     "sqlite3": "^5.0.8",
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
-    "@types/express": "^4.17.13",
+    "@types/express": "^5.0.0",
     "@types/node": "^16.3.2",
     "@types/sqlite3": "^5.0.0",
     "@vitest/coverage-v8": "^4.0.0",

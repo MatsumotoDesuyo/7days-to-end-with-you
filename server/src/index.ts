@@ -34,7 +34,9 @@ const jaDb = dbs.get('ja') as sqlite3.Database;
 const resolveDb = (lang: string): sqlite3.Database => dbs.get(lang) ?? jaDb;
 app.get('/api/search-word', createSearchWordHandler(resolveDb));
 
-app.get('*', (req, res) => {
+// SPA フォールバック。express 5 (path-to-regexp v8) では '*' 単体のルート構文が
+// 使えないため、名前付きワイルドカード '/{*splat}' で全 GET を受ける
+app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(path.resolve(__dirname, '../public/index.html')));
 });
 
