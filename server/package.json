@@ -17,7 +17,7 @@
     "log4js": "^6.3.0",
     "shared": "*",
     "sqlite3": "^5.0.8",
-    "rimraf": "^3.0.2"
+    "rimraf": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
