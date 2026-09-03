@@ -29,14 +29,14 @@
 
 ## AdSense
 
-- パブリッシャー ID: `ca-pub-9666515152781934` (client/index.html)
+- AdSense アカウント・pub-ID・root `ads.txt`・CMP (同意管理) は**組織の資産** (ORGANIZATION.md)。
+  アプリ側はスクリプトの組み込みと広告ユニットの配置のみを持つ
+- パブリッシャー ID: `ca-pub-9666515152781934` (client/index.html。発行元は組織)
 - 広告ユニット: 手動 1 ユニットのみ (スロット `8476370284`、components/ad-unit)。
   自動広告は `soncho-works.com` ドメイン単位でオフ済み (2026-09-03)
-- 同意管理: Google CMP (EEA/UK 限定配信) — AdSense コンソールで管理
-- プライバシーポリシー: https://7days-to-decode.soncho-works.com/privacy.html
-  (正本: client/public/privacy.html。CMP のポリシー URL にもこれを設定)
-- **ads.txt**: 内容の正本はこのリポジトリの `client/public/ads.txt`。
-  AdSense の仕様上、クローラーが参照するのは**ルートドメイン直下**
-  (`https://soncho-works.com/ads.txt`) のため、そこへの配置は platform へ
-  運用依頼する (このリポジトリの Issue で依頼・追跡)。行の内容が変わったら
-  正本を更新し、同様に platform へ依頼する
+- プライバシーポリシー (アプリ詳細分): https://7days-to-decode.soncho-works.com/privacy.html
+  (正本: client/public/privacy.html)
+- **ads.txt**: 正本は組織 (my-server の `org/ads.txt`) に移管済み (#36、2026-09)。
+  root (`https://soncho-works.com/ads.txt`) で配信中。アプリ側の複製
+  (client/public/ads.txt) は役目を終えたため削除した。広告システムの追加等で
+  行の変更が必要になったら、このリポジトリの Issue に **`to-org`** ラベルで申告する
