@@ -30,4 +30,11 @@
 ## AdSense
 
 - パブリッシャー ID: `ca-pub-9666515152781934` (client/index.html)
-- 方針: 手動 1 ユニット化 + Google CMP (EEA/UK 限定) + ads.txt (issue #12)
+- 広告ユニット: 手動 1 ユニットのみ (スロット `8476370284`、components/ad-unit)。
+  自動広告は `soncho-works.com` ドメイン単位でオフ済み (2026-09-03)
+- 同意管理: Google CMP (EEA/UK 限定配信) — AdSense コンソールで管理
+- **ads.txt**: 内容の正本はこのリポジトリの `client/public/ads.txt`。
+  AdSense の仕様上、クローラーが参照するのは**ルートドメイン直下**
+  (`https://soncho-works.com/ads.txt`) のため、そこへの配置は platform へ
+  運用依頼する (このリポジトリの Issue で依頼・追跡)。行の内容が変わったら
+  正本を更新し、同様に platform へ依頼する
