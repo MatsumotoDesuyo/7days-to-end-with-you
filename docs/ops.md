@@ -33,6 +33,8 @@
 - 広告ユニット: 手動 1 ユニットのみ (スロット `8476370284`、components/ad-unit)。
   自動広告は `soncho-works.com` ドメイン単位でオフ済み (2026-09-03)
 - 同意管理: Google CMP (EEA/UK 限定配信) — AdSense コンソールで管理
+- プライバシーポリシー: https://7days-to-decode.soncho-works.com/privacy.html
+  (正本: client/public/privacy.html。CMP のポリシー URL にもこれを設定)
 - **ads.txt**: 内容の正本はこのリポジトリの `client/public/ads.txt`。
   AdSense の仕様上、クローラーが参照するのは**ルートドメイン直下**
   (`https://soncho-works.com/ads.txt`) のため、そこへの配置は platform へ
