@@ -46,13 +46,16 @@ export default function Home() {
 
   return (
     <>
-      <Stack justifyContent="center" alignItems="center">
-        <Stack maxWidth="md" justifyContent="center" spacing={2}>
-          <Stack direction="row" justifyContent="flex-end">
+      <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
+        <Stack
+          spacing={2}
+          sx={{ maxWidth: 'md', justifyContent: 'center' }}
+        >
+          <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
             <Select
               value={lang}
               size="small"
-              inputProps={{ 'aria-label': 'language' }}
+              slotProps={{ input: { 'aria-label': 'language' } }}
               onChange={(event) => {
                 const next = event.target.value as Lang;
                 setLang(next);
@@ -66,12 +69,12 @@ export default function Home() {
               ))}
             </Select>
           </Stack>
-          <Typography variant="h5" textAlign="center">
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             7 Days to End with You
             <br />
             {t('titleLine2')}
           </Typography>
-          <Typography textAlign="center">
+          <Typography sx={{ textAlign: 'center' }}>
             {t('description1')}
             <br />
             {t('description2')}
@@ -84,15 +87,17 @@ export default function Home() {
               showAnalyzeText(inputText.substring(0, inputText.length - 1));
             }}
           />
-          <Grid container justifyContent="space-around">
-            <Grid item xs={8.5} md={9.5}>
+          <Grid container sx={{ justifyContent: 'space-around' }}>
+            <Grid size={{ xs: 8.5, md: 9.5 }}>
               <TextField
                 type="email"
                 inputMode="email"
                 value={inputText}
-                InputProps={{
-                  className: 'dtwey-font',
-                  style: { fontSize: '30px' },
+                slotProps={{
+                  input: {
+                    className: 'dtwey-font',
+                    style: { fontSize: '30px' },
+                  },
                 }}
                 label={t('inputLabel')}
                 onChange={(event) => {
@@ -101,7 +106,7 @@ export default function Home() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={3} md={2}>
+            <Grid size={{ xs: 3, md: 2 }}>
               <Button
                 variant="contained"
                 style={{ height: '100%' }}
@@ -116,7 +121,7 @@ export default function Home() {
           </Grid>
           <SuggestWordList wordMeans={wordMeans} />
           <SuggestTextList inputText={inputText} />
-          <Box p={3} />
+          <Box sx={{ p: 3 }} />
           <Typography variant="h5">{t('notesTitle')}</Typography>
           <Typography>
             {t('notes1')}

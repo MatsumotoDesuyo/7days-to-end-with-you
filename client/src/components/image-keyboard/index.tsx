@@ -11,7 +11,7 @@ export default function ImageKeyboard(props: Props) {
   return (
     <Grid container columnSpacing={0.5} rowSpacing={0.5}>
       {alphabets.map((c) => (
-        <Grid item xs={4} md={1.3333} key={c}>
+        <Grid size={{ xs: 4, md: 1.3333 }} key={c}>
           <Button
             fullWidth
             variant="outlined"
@@ -25,7 +25,7 @@ export default function ImageKeyboard(props: Props) {
           </Button>
         </Grid>
       ))}
-      <Grid item xs={4} md={1.3333}>
+      <Grid size={{ xs: 4, md: 1.3333 }}>
         <Button
           fullWidth
           variant="outlined"
