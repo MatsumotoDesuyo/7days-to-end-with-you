@@ -51,6 +51,7 @@ build と release/run の境界は不変アーティファクトである (Facto
 - アプリはイメージに**不変のタグ**を付けて push する。タグはソースのリビジョン (git SHA) から一意に導かれ、再利用・再 push しない (floating タグ `latest` / `server` は release ではない)。現行の導出形式は `<role>-<shortsha>` (例 `server-3f2a1c9`。role は同一リポジトリから複数イメージを出す場合の区別)。build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
 - platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。
 - **リリース履歴の正本は platform 側の台帳 (Git)** であり、ロールバックはその revert である。
+- **ブランチ運用は GitHub Flow で統一する。** 長命ブランチは `main` だけで、常にデプロイ可能に保つ。作業は `main` から切った短命ブランチで行い、Pull Request で `main` に戻す。`develop` / `release/*` / `hotfix/*` は持たない (バージョン付きのリリース列を持たないため)。platform が release の起点にするのは `main` である: コンテナは `main` からの build が dispatch され、静的サイトは `main` への merge がそのまま本番デプロイになる。ロールバックは台帳の revert または配信側の版の巻き戻しで行い、ブランチでは行わない。
 
 ## 組織 (ドメイン横断の資産)
 
