@@ -7,32 +7,32 @@
     "start": "ts-node-dev src/index.ts",
     "test": "vitest run",
     "lint": "eslint .",
-    "clean": "rimraf dist/*",
+    "clean": "rimraf dist",
     "build": "npm run clean && tsc && cpx -C ejdict.sqlite3 ./dist && cpx -C \"dict/*.sqlite3\" ./dist/dict"
   },
   "dependencies": {
     "@sentry/node": "^10.73.0",
-    "cpx": "^1.5.0",
+    "cpx2": "^2.0.0",
     "express": "^4.17.1",
     "log4js": "^6.3.0",
     "shared": "*",
     "sqlite3": "^5.0.8",
-    "rimraf": "^3.0.2"
+    "rimraf": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "@types/express": "^4.17.13",
     "@types/node": "^16.3.2",
-    "@types/sqlite3": "^3.1.8",
-    "@vitest/coverage-v8": "^3.0.0",
+    "@types/sqlite3": "^5.0.0",
+    "@vitest/coverage-v8": "^4.0.0",
     "eslint": "^9.0.0",
-    "eslint-config-prettier": "^9.1.0",
-    "globals": "^15.0.0",
-    "prettier": "^2.3.2",
+    "eslint-config-prettier": "^10.0.0",
+    "globals": "^17.0.0",
+    "prettier": "^3.0.0",
     "ts-node": "^10.1.0",
-    "ts-node-dev": "^1.1.8",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.0.0",
-    "vitest": "^3.0.0"
+    "vitest": "^4.0.0"
   }
 }
