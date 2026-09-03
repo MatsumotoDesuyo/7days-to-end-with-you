@@ -29,6 +29,7 @@
 ## 検証の流儀 (重要)
 
 - ローカル実機 (Windows) では検証せず、**CI と同じ Linux + Node 22 の Docker コンテナで検証**する
+- 依存更新など挙動リスクのある変更は、push 前に `bash scripts/image-smoke.sh` で本番イメージの起動 E2E (SPA 配信・実辞書ヒット・graceful shutdown) も確認する
 - 挙動を変更する PR は use-cases.md → test-cases.md → テスト → 実装の順で同時更新する
 - 仕様かバグか曖昧な挙動は勝手に直さない。ユーザーの判断を仰ぐ
 - 合格ライン: push → CI 緑 (lint + build + テスト) → GHCR イメージ自動更新
