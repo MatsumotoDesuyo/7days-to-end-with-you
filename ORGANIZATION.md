@@ -19,7 +19,7 @@
 |---|---|---|---|---|---|---|
 | d-data-server | d-data.soncho-works.com | v3 コンテナ + Caddy | `d-data-server` | `d-data-server` | なし | なし |
 | 7days-to-end-with-you | 7days-to-decode.soncho-works.com | v3 コンテナ + Caddy | `7days-server` | `7days-server` | **あり** (pub-9666515152781934) | GA4 (アプリ側で設計中) |
-| map-scan-code | map-scan-code.soncho-works.com | Cloudflare Workers Static Assets | なし | なし (外形監視のみ) | なし | なし |
+| map-scan-code | map-scan-code.soncho-works.com | Cloudflare Workers Static Assets | なし | なし (外形監視のみ) | **あり** (pub-9666515152781934、`/` のみ) | GA4 `G-V20P5EBEL7` |
 | soncho-works-site | soncho-works.com (apex) | Cloudflare Workers Static Assets (2026-09-04 に WordPress から移行) | なし | なし (外形監視のみ) | **あり** (root `ads.txt` を配信) | Google タグ `GT-M6XHF7Q`、Search Console 検証あり |
 
 ## 組織が発行・配信するもの
