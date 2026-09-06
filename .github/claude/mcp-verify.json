@@ -14,13 +14,6 @@
       "env": {
         "SENTRY_ACCESS_TOKEN": "${SENTRY_VIEWER_TOKEN}"
       }
-    },
-    "analytics-ro": {
-      "command": "uvx",
-      "args": ["analytics-mcp"],
-      "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "${USERPROFILE}/.config/ga/ga-sa.json"
-      }
     }
   }
 }

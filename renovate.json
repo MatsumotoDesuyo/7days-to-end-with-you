@@ -16,6 +16,11 @@
       "description": "minor/patch は週 1 でまとめて 1 PR に",
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "minor-and-patch"
+    },
+    {
+      "description": "claude-*.yml は my-server (ADR 0013) から配布される複製。bump は正本側で行い、ここでは更新しない",
+      "matchFileNames": [".github/workflows/claude-*.yml"],
+      "enabled": false
     }
   ]
 }
