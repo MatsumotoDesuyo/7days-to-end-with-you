@@ -5,6 +5,8 @@
 #   - Issue に ai/needs-fix が付いた  -> 検証で差し戻された。新しい PR で直す
 #   - PR    に ai/needs-fix が付いた  -> レビューで差し戻された。同じ PR に追加コミットで直す
 # ラベルを付ける者が Claude (レビュー / 検証の bot) のこともあるため allowed_bots を許可する。
+# ツールは allowlist (Bash は npm/npx/node/git/gh/docker の prefix のみ、WebFetch 無し)。
+# アプリ固有に必要な追加は、アプリ側の .claude/settings.json の permissions.allow で宣言する。
 name: AI implement
 
 on:
@@ -69,4 +71,4 @@ jobs:
           claude_args: |
             --model claude-opus-5
             --max-turns 80
-            --allowedTools "Bash,Read,Write,Edit,MultiEdit,Glob,Grep,WebFetch"
+            --allowedTools "Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(git:*),Bash(gh:*),Bash(docker:*),Read,Write,Edit,MultiEdit,Glob,Grep"

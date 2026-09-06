@@ -12,10 +12,11 @@ on:
         description: "release されたイメージタグ (例 server-3f2a1c9)"
         required: true
       prev:
-        description: "直前のタグ (差分の起点)"
-        required: true
+        description: "直前のタグ (差分の起点。初回 release では空)"
+        required: false
+        default: ""
       result:
-        description: "deployed | rolled_back"
+        description: "deployed (health 合格) | rolled_back (health 失敗で直前タグへ戻した) | failed (release に至らなかった)"
         required: true
 
 permissions:
@@ -51,9 +52,12 @@ jobs:
             タグの末尾 7 桁が git の short SHA です。
 
             ## やること
-            1. `git log <prev の SHA>..<tag の SHA>` に含まれる merge / PR を `gh` で特定し、それらが Closes している
+            1. prev が空なら「差分の起点なし (初回 release)」として何もせず終了する。
+               `git log <prev の SHA>..<tag の SHA>` に含まれる merge / PR を `gh` で特定し、それらが Closes している
                Issue を列挙する。該当 Issue が無ければ、そのまま終了する (依存更新等)。
-            2. result が `rolled_back` なら、各 Issue に「release が health 失敗でロールバックされた」ことと
+            2. result が `failed` なら、release 自体が失敗した (SSH・pull 等。Issue の責任ではない)。各 Issue に
+               その旨と deploy run の URL をコメントするだけで、ラベルは付けずに終了する。
+               result が `rolled_back` なら、各 Issue に「release が health 失敗でロールバックされた」ことと
                deploy run の URL をコメントし、`ai/needs-fix` を付けて終了する。
             3. result が `deployed` なら、各 Issue の「受け入れ条件」を**そのまま実行**する (curl、jq 等は Bash で、
                errors は `sentry-ro`、logs / metrics は `grafana-ro` の MCP で読む。`service=<name>` で絞る)。
