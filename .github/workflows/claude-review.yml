@@ -23,17 +23,26 @@ concurrency:
 
 jobs:
   review:
-    # draft と、依存更新 bot の PR は見ない。AI (claude[bot]) が出した PR は本線なので除外しない
+    # draft、依存更新 bot の PR、platform のドキュメント同期 PR (platform/sync-docs) は見ない。
+    # AI (claude[bot]) が出した PR は本線なので除外しない
     if: >-
       github.event.pull_request.draft == false &&
       github.event.pull_request.user.login != 'renovate[bot]' &&
-      github.event.pull_request.user.login != 'dependabot[bot]'
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      !startsWith(github.event.pull_request.head.ref, 'platform/sync-docs')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+
+      # --- アプリ固有: ツールチェーン (配布時にアプリの CI と揃える。Node を使わないアプリは削除) ---
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.x
+          cache: "npm"
+      # --- ここまで ---
 
       - uses: anthropics/claude-code-action@v1
         with:

@@ -38,7 +38,7 @@ jobs:
       SENTRY_VIEWER_TOKEN: ${{ secrets.SENTRY_VIEWER_TOKEN }}
       GRAFANA_VIEWER_TOKEN: ${{ secrets.GRAFANA_VIEWER_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

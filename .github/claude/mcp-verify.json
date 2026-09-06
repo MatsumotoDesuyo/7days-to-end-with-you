@@ -2,7 +2,7 @@
   "mcpServers": {
     "grafana-ro": {
       "command": "docker",
-      "args": ["run","-i","--rm","-e","GRAFANA_URL","-e","GRAFANA_SERVICE_ACCOUNT_TOKEN","grafana/mcp-grafana","-t","stdio","--disable-write"],
+      "args": ["run","-i","--rm","-e","GRAFANA_URL","-e","GRAFANA_SERVICE_ACCOUNT_TOKEN","grafana/mcp-grafana:1.3.0","-t","stdio","--disable-write"],
       "env": {
         "GRAFANA_URL": "https://maroonkinkajou2355.grafana.net",
         "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_VIEWER_TOKEN}"

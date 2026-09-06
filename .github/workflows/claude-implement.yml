@@ -6,7 +6,8 @@
 #   - PR    に ai/needs-fix が付いた  -> レビューで差し戻された。同じ PR に追加コミットで直す
 # ラベルを付ける者が Claude (レビュー / 検証の bot) のこともあるため allowed_bots を許可する。
 # ツールは allowlist (Bash は npm/npx/node/git/gh/docker の prefix のみ、WebFetch 無し)。
-# アプリ固有に必要な追加は、アプリ側の .claude/settings.json の permissions.allow で宣言する。
+# アプリ固有に必要な追加 (例: `Bash(bash scripts/:*)`) は、アプリ側の .claude/settings.json の
+# permissions.allow で宣言する。CLAUDE.md が要求する検証コマンドが allowlist に無いと AI は到達できない。
 name: AI implement
 
 on:
@@ -28,17 +29,26 @@ concurrency:
 
 jobs:
   implement:
+    # ai/needs-human が付いている対象は起動しない (差戻しループの歯止めを GitHub 側にも置く)
     if: >-
-      github.event.label.name == 'ai/implement' ||
-      github.event.label.name == 'ai/needs-fix'
+      (github.event.label.name == 'ai/implement' || github.event.label.name == 'ai/needs-fix') &&
+      !contains(github.event.issue.labels.*.name, 'ai/needs-human') &&
+      !contains(github.event.pull_request.labels.*.name, 'ai/needs-human')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           # PR への差戻しなら PR のブランチで作業する
           ref: ${{ github.event.pull_request.head.ref || github.event.repository.default_branch }}
+
+      # --- アプリ固有: ツールチェーン (配布時にアプリの CI と揃える。Node を使わないアプリは削除) ---
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.x
+          cache: "npm"
+      # --- ここまで ---
 
       - uses: anthropics/claude-code-action@v1
         with:
