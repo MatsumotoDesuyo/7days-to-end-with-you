@@ -1,18 +1,18 @@
 {
   "mcpServers": {
     "grafana-ro": {
-      "command": "docker",
-      "args": ["run","-i","--rm","-e","GRAFANA_URL","-e","GRAFANA_SERVICE_ACCOUNT_TOKEN","grafana/mcp-grafana","-t","stdio","--disable-write"],
+      "command": "mcp-grafana",
+      "args": ["-t", "stdio", "--disable-write"],
       "env": {
         "GRAFANA_URL": "https://maroonkinkajou2355.grafana.net",
         "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_VIEWER_TOKEN}"
       }
     },
     "sentry-ro": {
-      "command": "npx",
-      "args": ["-y", "@sentry/mcp-server@0.39.0"],
-      "env": {
-        "SENTRY_ACCESS_TOKEN": "${SENTRY_VIEWER_TOKEN}"
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp?skills=inspect",
+      "headers": {
+        "Authorization": "Sentry-Bearer ${SENTRY_VIEWER_TOKEN}"
       }
     },
     "analytics-ro": {
