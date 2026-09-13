@@ -33,8 +33,9 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 - 資源の実使用は同じプレーンで読める: サービス別 CPU / メモリはダッシュボード `my-server-overview`、または `container_memory_working_set_bytes{service=<name>}` / `rate(container_cpu_usage_seconds_total{service=<name>}[5m])`。host 全体の容量と余裕は `node_memory_MemTotal_bytes` / `node_memory_MemAvailable_bytes`。現在、サービス別の上限は設けておらず host の余裕を共有している。上限を設ける場合は platform が宣言する。
 - 閲覧先 (共有プレーン): logs / metrics は **Grafana** https://maroonkinkajou2355.grafana.net (Explore またはダッシュボード、`service=<name>` で絞り込む)。errors は **Sentry** https://watashihamatsumotodesu.sentry.io (project = サービス名)。
 - **アプリ側のエージェントは、このリポジトリに `.mcp.json` が提供されている場合、そこに定義された read-only MCP で上記を直接読める**: `grafana-ro` (logs / metrics)、`sentry-ro` (errors)。自サービスの障害調査・エラー確認はまず両 MCP で自律的に行い、人に telemetry を貼ってもらう前提にしない。書き込み権限はなく、他サービスの秘密には届かない。
-- platform が Discord (#alerts) に通知するのは閾値を超えたものだけ: 基盤は Grafana Alerting (メモリ余裕・CPU・再起動ループ)、アプリは Sentry の regression / 急増。日常のエラーは通知されないため、自サービスのエラーは `sentry-ro` で能動的に確認する。
-- ローカル / 開発環境の Sentry: DSN は本番と同一 (project 単位) で、区別は `SENTRY_ENVIRONMENT` で行う (platform が run するものは `prod`、ローカルは `dev`)。platform の通知は `prod` の event だけを対象にするので、ローカルのエラーで #alerts は鳴らない。ローカルは既定で `SENTRY_DSN` 未設定 (SDK 無効) とし、SDK の配線を確かめたいときだけ設定する (無料枠は org 全体で共有のため)。DSN の値は `sentry-ro` (自分の project の Client Keys) で自分で参照できる。platform に問い合わせる必要はない。
+- platform が Discord (#alerts) に通知するのは閾値を超えたものだけ: 基盤は Grafana Alerting (メモリ余裕・CPU・再起動ループ、およびアプリが宣言した health エンドポイントの継続的な異常)、アプリは Sentry の regression / 急増。日常のエラーは通知されないため、自サービスのエラーは `sentry-ro` で能動的に確認する。
+- platform が起動する定期処理 (systemd タイマーから叩く HTTP エンドポイント) は、2xx を返したときだけ Healthchecks.io に ping する。ping が途絶えると #alerts に P2 (無言) で流れる。何を非 2xx にするか (失敗の定義) はアプリの責務。一時的な部分失敗で 2xx を返すか、非 2xx にして通知に寄せるかはアプリが決める。判定は `curl -f` なので、400 以上が失敗で、3xx は成功として扱われる。対象のタイマーと許容時間の正本は my-server の `observability/healthchecks/checks.json` で、すべてのタイマーが対象ではない。
+- ローカル / 開発環境の Sentry: DSN は本番と同一 (project 単位) で、区別は `SENTRY_ENVIRONMENT` で行う (platform が run するものは `prod`、ローカルは `dev`)。platform の通知は `prod` の event だけを対象にするので、ローカルのエラーで #alerts は鳴らない。ローカルは既定で `SENTRY_DSN` 未設定 (SDK 無効) とし、SDK の配線を確かめたいときだけ設定する (無料枠は org 全体で共有のため)。DSN の値は自分で参照できる: `SENTRY_VIEWER_TOKEN` で Sentry API `GET /api/0/projects/<org>/<project>/keys/` を読むか、Web UI (Settings → Projects → <project> → Client Keys) で見る (`sentry-ro` は読み取り専用に絞っているため DSN のツールを持たない)。platform に問い合わせる必要はない。
 
 ## 導出ルール
 
@@ -49,7 +50,7 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 build と release/run の境界は不変アーティファクトである (Factor V)。アプリは *build* を所有し、生成したアーティファクトの identity を platform に渡す。release と run (どこへ・どう配置するか) は platform が実行し、アプリはそれを知らない・触らない (ホストへの SSH も配置先の知識も持たない)。
 
 - アプリはイメージに**不変のタグ**を付けて push する。タグはソースのリビジョン (git SHA) から一意に導かれ、再利用・再 push しない (floating タグ `latest` / `server` は release ではない)。現行の導出形式は `<role>-<shortsha>` (例 `server-3f2a1c9`。role は同一リポジトリから複数イメージを出す場合の区別)。build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
-- platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。
+- platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。health はコンテナの状態 (crash-loop / 停止 / unhealthy) に加え、**アプリが health エンドポイントを宣言していればその HTTP ステータス**で判定する (200 = 成功、それ以外・接続不可・タイムアウト = 失敗。コンテナ判定 (起動 12 秒後) の後、最大 60 秒再試行する。本文は判定に使わない)。宣言は `ops/bin/remote-deploy.sh` の `health_url` に載せる。同じエンドポイントを Grafana Alerting が常時 probe する (`compose/alloy/config.alloy`)。
 - **リリース履歴の正本は platform 側の台帳 (Git)** であり、ロールバックはその revert である。
 - **ブランチ運用は GitHub Flow で統一する。** 長命ブランチは `main` だけで、常にデプロイ可能に保つ。作業は `main` から切った短命ブランチで行い、Pull Request で `main` に戻す。`develop` / `release/*` / `hotfix/*` は持たない (バージョン付きのリリース列を持たないため)。platform が release の起点にするのは `main` である: コンテナは `main` からの build が dispatch され、静的サイトは `main` への merge がそのまま本番デプロイになる。ロールバックは台帳の revert または配信側の版の巻き戻しで行い、ブランチでは行わない。
 - **静的サイト (Cloudflare Workers Static Assets) の受け渡し**: アプリは配信ディレクトリと `wrangler.jsonc` を *build* の成果として渡す。`wrangler.jsonc` は**リポジトリ直下**に置く (platform は Workers Builds を既定コマンドで動かし、アプリ固有の引数を持たない。ADR 0014)。`main` への push が本番デプロイで、それ以外のブランチは version のアップロードのみで本番に出ない。
