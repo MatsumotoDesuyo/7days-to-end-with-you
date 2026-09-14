@@ -5,17 +5,33 @@
   "prConcurrentLimit": 3,
   "prHourlyLimit": 3,
   "labels": ["renovate"],
+  "minimumReleaseAge": "7 days",
+  "vulnerabilityAlerts": {
+    "labels": ["renovate", "security"]
+  },
   "packageRules": [
     {
-      "description": "Node のメジャー更新 (ベースイメージ / engines) はアプリ側の判断で実施するため Renovate では保留",
-      "matchPackageNames": ["node"],
+      "description": "Node のメジャー更新は、本番 (Dockerfile のベースイメージ)・CI (setup-node の node-version)・@types/node を揃えてアプリ側の判断で行うため保留。以前の matchPackageNames: [\"node\"] は Dockerfile にしか効かず、CI と @types/node が漏れた (#38)。Node を上げると決めたら、このルールを消す (下のメジャーのルールでダッシュボードの承認待ちに出るので、そこで選ぶ)",
+      "matchDepNames": ["node", "@types/node"],
       "matchUpdateTypes": ["major"],
       "enabled": false
     },
     {
-      "description": "minor/patch は週 1 でまとめて 1 PR に",
+      "description": "npm の minor/patch は週 1 でまとめて 1 PR に。将来の自動 merge の対象 (my-server ADR 0015 決定 8)",
+      "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "minor-and-patch"
+      "groupName": "npm minor-and-patch"
+    },
+    {
+      "description": "GitHub Actions・Dockerfile の minor/patch は npm と別の PR に。自動 merge の対象の外 (人が merge する) なので、npm のまとめに混ぜない",
+      "matchManagers": ["github-actions", "dockerfile"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "actions-and-docker minor-and-patch"
+    },
+    {
+      "description": "メジャーは PR にせず Dependency Dashboard に並べ、人が選んだものだけ PR にする",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
     }
   ]
 }
