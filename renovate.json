@@ -11,7 +11,7 @@
   },
   "packageRules": [
     {
-      "description": "Node のメジャー更新は、本番 (Dockerfile のベースイメージ)・CI (setup-node の node-version)・@types/node を揃えてアプリ側の判断で行うため保留。以前の matchPackageNames: [\"node\"] は Dockerfile にしか効かず、CI と @types/node が漏れた (#38)",
+      "description": "Node のメジャー更新は、本番 (Dockerfile のベースイメージ)・CI (setup-node の node-version)・@types/node を揃えてアプリ側の判断で行うため保留。以前の matchPackageNames: [\"node\"] は Dockerfile にしか効かず、CI と @types/node が漏れた (#38)。Node を上げると決めたら、このルールを消す (下のメジャーのルールでダッシュボードの承認待ちに出るので、そこで選ぶ)",
       "matchDepNames": ["node", "@types/node"],
       "matchUpdateTypes": ["major"],
       "enabled": false
