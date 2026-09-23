@@ -1,7 +1,9 @@
 # 運用台帳 (アプリ側管轄のリソース)
 
 アプリ側が所有する外部リソースの台帳。platform (my-server) 管轄のもの (VPS、GHCR、Grafana/Sentry の provisioning) は含まない。
-方針: product analytics (GA) とその資格情報はアプリ側の管轄 (運用監視の Sentry/Grafana は platform 管轄)。
+方針: GA4 の計測の設計 (タグ・イベント) はアプリ側の管轄。GA のアカウント・プロパティの設定と資格情報はアプリ側に置かない
+(設定変更は PO の画面か `to-org` の Issue、読み取りは platform の CLI。my-server#106 §11 の判断 6 (改)、my-server#132)。
+運用監視の Sentry/Grafana は platform の管轄。
 
 ## 本番サイト
 
@@ -15,17 +17,22 @@
   現行の GA アカウントのどこにも属さない死んだ ID (2026-09 確認)。新プロパティで置換済み
 - **現行**: アカウント `howel` (accounts/354084641) / プロパティ `7days-to-decode` (properties/552684947) /
   Web データストリーム (dataStreams/15664852217) / **測定 ID `G-HL1N4FK04L`** (2026-09-03 に Admin API で作成)
+- **読み取り**: 作業 PC の my-server の clone の CLI で読む。
+  `python C:/Projects/my-server/ops/bin/ga4-report.py report --property 552684947` (軸は `--by page|date|host`)。
+  資格情報は platform 用 SA のなりすまし (鍵なし) で、アプリ側は持たない。要るもの: User の環境変数
+  `GOOGLE_PLATFORM_SA`、gcloud のログイン、my-server の clone が my-server#148 以降の版であること。詳細は my-server の `ops/runbooks/google-api-credentials.md`
+  - `GOOGLE_PLATFORM_SA` は User の環境変数なので、設定より前に起動した VS Code (とその中の Claude のセッション) には入っていない。
+    「`GOOGLE_PLATFORM_SA` が空」で失敗したら、VS Code を完全に再起動するか、User の値をプロセスに読み込んでから実行する
+    (PowerShell: `$env:GOOGLE_PLATFORM_SA = [Environment]::GetEnvironmentVariable('GOOGLE_PLATFORM_SA', 'User')`)
+- **設定変更** (データ ストリーム、カスタム ディメンション等): アプリの AI は行わない。PO が GA の画面で行うか、
+  このリポジトリに **`to-org`** ラベルの Issue で依頼する (ads.txt と同じ経路)
 
-## GCP (GA 委託用)
+## GCP
 
-- プロジェクト: `tools-475203` (既存のツール用プロジェクトに相乗り)
-- 有効化 API: Analytics Admin API / Analytics Data API
-- サービスアカウント: `ga-agent-7days@tools-475203.iam.gserviceaccount.com`
-  - GCP 側ロール: なし (GCP リソースには何の権限も持たない)
-  - GA 側権限: GA アカウントの「編集者」(アカウントのアクセス管理で付与)
-- JSON キー: `%USERPROFILE%\.config\ga\ga-sa.json` (ローカルのみ・リポジトリ外)
-  - 漏洩時の対処: GCP コンソール (または gcloud) でキーを削除し再発行。GA 側の権限剥奪でも無効化できる
-- 用途: AI エージェントによる GA の設定変更 (Admin API) とレポート閲覧 (Data API / analytics-mcp)
+- アプリ側の GCP 資源は無い
+- 旧: `tools-475203` の SA `ga-agent-7days@tools-475203.iam.gserviceaccount.com` (GA アカウント `howel` の編集者、JSON 鍵) と
+  `analytics-ro` MCP は my-server#132 で撤去する (読み取りは上の CLI に一本化)。MCP の定義はこの repo から外した。
+  SA・鍵ファイル・gcloud の登録は PO が削除する (手順と記録は my-server#132)
 
 ## AdSense
 
