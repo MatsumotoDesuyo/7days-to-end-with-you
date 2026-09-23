@@ -21,6 +21,9 @@
   `python C:/Projects/my-server/ops/bin/ga4-report.py report --property 552684947` (軸は `--by page|date|host`)。
   資格情報は platform 用 SA のなりすまし (鍵なし) で、アプリ側は持たない。要るもの: User の環境変数
   `GOOGLE_PLATFORM_SA`、gcloud のログイン、my-server の clone が my-server#148 以降の版であること。詳細は my-server の `ops/runbooks/google-api-credentials.md`
+  - platform 用 SA は GA4 の**閲覧者** (スコープ `analytics.readonly`) なので、この経路では設定変更に届かない (設定変更は下の経路)。
+  - `ops/bin/ga4-report.py` が無い (clone が my-server#148 より前の版) ときは、my-server の作業ツリーを触らず
+    (`git pull` / checkout もしない。並行のセッションが使う共有の作業ツリー)、PO か my-server のセッションに更新を頼む。
   - `GOOGLE_PLATFORM_SA` は User の環境変数なので、設定より前に起動した VS Code (とその中の Claude のセッション) には入っていない。
     「`GOOGLE_PLATFORM_SA` が空」で失敗したら、VS Code を完全に再起動するか、User の値をプロセスに読み込んでから実行する
     (PowerShell: `$env:GOOGLE_PLATFORM_SA = [Environment]::GetEnvironmentVariable('GOOGLE_PLATFORM_SA', 'User')`)
