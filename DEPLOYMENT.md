@@ -58,7 +58,7 @@ build と release/run の境界は不変アーティファクトである (Facto
 - platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。health はコンテナの状態 (crash-loop / 停止 / unhealthy) に加え、**アプリが health エンドポイントを宣言していればその HTTP ステータス**で判定する (200 = 成功、それ以外・接続不可・タイムアウト = 失敗。コンテナ判定 (起動 12 秒後) の後、最大 60 秒再試行する。本文は判定に使わない)。宣言は `ops/bin/remote-deploy.sh` の `health_url` に載せる。同じエンドポイントを Grafana Alerting が常時 probe する (`compose/alloy/config.alloy`)。
 - **リリース履歴の正本は platform 側の台帳 (Git)** であり、ロールバックはその revert である。
 - **ブランチ運用は GitHub Flow で統一する。** 長命ブランチは `main` だけで、常にデプロイ可能に保つ。作業は `main` から切った短命ブランチで行い、Pull Request で `main` に戻す。`develop` / `release/*` / `hotfix/*` は持たない (バージョン付きのリリース列を持たないため)。platform が release の起点にするのは `main` である: コンテナは `main` からの build が dispatch され、静的サイトは `main` への merge がそのまま本番デプロイになる。ロールバックは台帳の revert または配信側の版の巻き戻しで行い、ブランチでは行わない。
-- **静的サイト (Cloudflare Workers Static Assets) の受け渡し**: アプリは配信ディレクトリと `wrangler.jsonc` を *build* の成果として渡す。`wrangler.jsonc` は**リポジトリ直下**に置く (platform は Workers Builds を既定コマンドで動かし、アプリ固有の引数を持たない。ADR 0014)。`main` への push が本番デプロイで、それ以外のブランチは version のアップロードのみで本番に出ない。
+- **静的サイト (Cloudflare Workers Static Assets) の受け渡し**: アプリは配信ディレクトリと `wrangler.jsonc` を *build* の成果として渡す。`wrangler.jsonc` は**リポジトリ直下**に置く (platform は Workers Builds を既定コマンドで動かし、アプリ固有の引数を持たない。ADR 0014)。`main` への push が本番デプロイで、それ以外のブランチは version のアップロードのみで本番に出ない。**`workers.dev` 系の入口の開閉 (`workers_dev` / `preview_urls`) は platform が決める値で、置き場所が `wrangler.jsonc` でもアプリは変更しない** (ADR 0014 決定 5)。
 
 ## 組織 (ドメイン横断の資産)
 
