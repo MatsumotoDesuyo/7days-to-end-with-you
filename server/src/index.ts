@@ -5,6 +5,7 @@ import express from 'express';
 import { connectLogger } from 'log4js';
 import path from 'path';
 import { DatabaseSync } from 'node:sqlite';
+import createHealthHandler from './health';
 import createSearchWordHandler from './search-word';
 import { sysLogger, accessLogger } from './logger';
 
@@ -34,6 +35,8 @@ DICT_LANGS.forEach((lang) => {
 const jaDb = dbs.get('ja') as DatabaseSync;
 const resolveDb = (lang: string): DatabaseSync => dbs.get(lang) ?? jaDb;
 app.get('/api/search-word', createSearchWordHandler(resolveDb));
+// N13 (#51): 辞書の health。SPA フォールバックより前に置く
+app.get('/api/health', createHealthHandler(dbs));
 
 // SPA フォールバック。express 5 (path-to-regexp v8) では '*' 単体のルート構文が
 // 使えないため、名前付きワイルドカード '/{*splat}' で全 GET を受ける

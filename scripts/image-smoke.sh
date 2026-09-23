@@ -4,6 +4,7 @@
 # ルートの Dockerfile で本番イメージを build し、起動したコンテナに対して
 #   1. GET / が SPA の index.html を返す
 #   2. GET /api/search-word が実辞書のヒットを返す (RQH -> one, api.test.ts と同じ実例)
+#      GET /api/health が全辞書の照会を通して 200 を返す (N13 / #51)
 #   3. SIGTERM で graceful shutdown する (exit code 0)
 # を確認する。CI には組み込んでおらず、Docker が動く環境でリリース前に手動実行する。
 #   使い方: bash scripts/image-smoke.sh   (PORT 環境変数で待受ポートを変更可)
@@ -39,6 +40,11 @@ echo '===== GET /api/search-word (実辞書) ====='
 body=$(curl -fsS "http://localhost:$PORT/api/search-word?word=RQH&lang=ja")
 echo "$body" | grep -q '"word":"one"'
 echo 'OK: dictionary hit (RQH -> one)'
+
+echo '===== GET /api/health (全辞書, N13) ====='
+body=$(curl -fsS "http://localhost:$PORT/api/health")
+echo "$body" | grep -q '"status":"ok"'
+echo 'OK: health 200 (all dictionaries)'
 
 echo '===== SIGTERM graceful shutdown ====='
 docker stop -t 10 "$NAME" >/dev/null
