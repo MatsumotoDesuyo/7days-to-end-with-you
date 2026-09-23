@@ -35,7 +35,15 @@ describe('UT-10 instrument (Sentry)', () => {
       dsn: 'https://public@sentry.example/1',
       environment: 'test-env',
       release: 'server-test123',
-      tracesSampleRate: 1.0,
+      tracesSampler: expect.any(Function),
     });
+  });
+
+  test('#52: traces は全量、ただし /api/health (probe) だけは送らない', async () => {
+    const { tracesSampler } = await import('./instrument');
+    expect(tracesSampler({ attributes: { 'url.path': '/api/health' } })).toBe(0);
+    expect(tracesSampler({ attributes: { 'url.path': '/api/search-word' } })).toBe(1.0);
+    expect(tracesSampler({ attributes: { 'url.path': '/api/healthz' } })).toBe(1.0);
+    expect(tracesSampler({})).toBe(1.0);
   });
 });

@@ -68,7 +68,7 @@
 | N10 | UI 言語と辞書言語 | ja/en/fr/it/de/es/pt/zh の 8 言語。初期値はブラウザ言語（対応言語に前方一致、なければ en）、保存された選択が最優先。辞書検索は選択言語の辞書を引き、意味は「訳語 — 英語語義」形式（en は語義のみ、ja は従来の ejdict）。未対応 lang は ja にフォールバック | 確定（#2） |
 | N11 | 計測（GA4） | **本番ビルドのみ** gtag をロードし、dev/CI からは一切送信しない。Consent Mode v2 で EEA/UK/スイスのみデフォルト拒否（他地域は許可）。イベントは page_view（自動）+ `dict_search`（lang 付き）+ `language_change` の最小セット。測定 ID は `G-HL1N4FK04L`（docs/ops.md） | 確定（#12） |
 | N12 | 広告（AdSense） | 手動 1 ユニットのみ（ページ最下部、注意事項の下）。自動広告は使わない。高さを事前確保しレイアウトシフトを起こさない。dev では実広告をロードしない。同意は Google CMP（EEA/UK 限定配信） | 確定（#12） |
-| N13 | health | `GET /api/health` は全辞書（ja + 7 言語）に軽い照会をし、すべて通れば 200、1 つでも失敗すれば 503（本文 JSON に失敗した言語だけを載せ、例外の詳細は stdout にだけ出す）。platform の deploy 判定と Grafana の probe が使う（Sentry → Discord の経路とは独立に辞書の故障を拾うため） | 確定（#51） |
+| N13 | health | `GET /api/health` は全辞書（ja + 7 言語）に軽い照会をし、すべて通れば 200、1 つでも失敗すれば 503（本文 JSON に失敗した言語だけを載せ、例外の詳細は stdout にだけ出す）。platform の deploy 判定と Grafana の probe に登録して使う（to-platform で依頼。Sentry → Discord の経路とは独立に辞書の故障を拾うため）。照会は先頭 1 行だけなので、ファイルの途中の破損は拾えない（その場合は N8 の p2 が拾い、互いに補う）。probe は Sentry の traces に載せない | 確定（#51） |
 
 ## 5. スコープ外
 
