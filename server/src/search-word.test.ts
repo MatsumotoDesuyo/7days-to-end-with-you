@@ -5,7 +5,12 @@ import createSearchWordHandler from './search-word';
 // docs/test-cases.md UT-08: SQL エラーパスでも必ず応答が返ること (#3)
 
 type Row = { word: string; mean: string };
-type InvokeResult = { status?: number; body?: string; sent: boolean };
+type InvokeResult = {
+  status?: number;
+  body?: string;
+  sent: boolean;
+  alerts: { kind: string; err: unknown }[];
+};
 
 function createFakeDb(options: {
   error?: Error;
@@ -40,7 +45,7 @@ function invoke(
   if (word !== undefined) query.word = word;
   if (lang !== undefined) query.lang = lang;
   const req = { query } as unknown as express.Request;
-  const result: InvokeResult = { sent: false };
+  const result: InvokeResult = { sent: false, alerts: [] };
   const res = {
     status(code: number) {
       result.status = code;
@@ -57,7 +62,11 @@ function invoke(
     return db;
   };
   // node:sqlite は同期 API のため、ハンドラは戻った時点で応答を終えている
-  createSearchWordHandler(resolveDb)(req, res);
+  // #51: p2 の通知は注入して記録する (実物の抑制・Sentry は UT-13 で検証)
+  const alert = (kind: string, err: unknown) => {
+    result.alerts.push({ kind, err });
+  };
+  createSearchWordHandler(resolveDb, alert)(req, res);
   return result;
 }
 
@@ -67,6 +76,17 @@ describe('UT-08 search-word ハンドラ', () => {
     expect(result.sent).toBe(true);
     expect(result.status).toBe(500);
     expect(result.body).toBe('[]');
+  });
+
+  test('#51: SQL エラー時は kind dict-query-failed で p2 の通知を 1 回呼ぶ', () => {
+    const err = new Error('SQLITE_ERROR: no such table: items');
+    const result = invoke(createFakeDb({ prepareError: err }), 'RQH');
+    expect(result.alerts).toEqual([{ kind: 'dict-query-failed', err }]);
+  });
+
+  test('#51: 成功時・空入力では p2 の通知を呼ばない', () => {
+    expect(invoke(createFakeDb({ rows: [] }), 'RQH').alerts).toEqual([]);
+    expect(invoke(createFakeDb({}), '').alerts).toEqual([]);
   });
 
   test('N8: prepare 段階のエラー (辞書破損等) でも 500 で応答しプロセスは落ちない', () => {

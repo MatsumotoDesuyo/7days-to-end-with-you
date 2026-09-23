@@ -1,14 +1,15 @@
-import * as Sentry from '@sentry/node';
 import express from 'express';
 import type { DatabaseSync } from 'node:sqlite';
 import { AnalyseSentense } from 'shared';
+import { sendAlert, type SendAlert } from './alert';
 import { sysLogger } from './logger';
 
 // UC3: 辞書検索。全シフト候補のうち辞書に存在する単語を意味つきで返す。
 // lang パラメータで言語別辞書を引く (N10)。未指定・未対応言語は日本語 (ejdict)。
-// resolveDb を注入するファクトリ形式にして、エラーパス (UT-08) を単体検証可能にする。
+// resolveDb と alert を注入するファクトリ形式にして、エラーパス (UT-08) を単体検証可能にする。
 export default function createSearchWordHandler(
-  resolveDb: (lang: string) => DatabaseSync
+  resolveDb: (lang: string) => DatabaseSync,
+  alert: SendAlert = sendAlert
 ) {
   return (req: express.Request, res: express.Response): void => {
     const lang = req.query.lang?.toString() ?? 'ja';
@@ -27,7 +28,8 @@ export default function createSearchWordHandler(
       questions += '?';
     }
     // #3 (N8): エラー時にも必ず応答を返す (クライアントをハングさせない)
-    // #14: ハンドリング済みエラーも Sentry へ emit (未初期化時は no-op)
+    // #14: ハンドリング済みエラーも Sentry へ emit (未初期化時は no-op)。
+    //      #51 からは alert=p2 付き (抑制つき) で送る
     // node:sqlite は同期 API で、prepare 段階 (辞書破損による no such table 等)・
     // 実行段階のどちらの失敗も例外として送出するため、try/catch 一本で畳める
     // (sqlite3 時代はコールバック未指定だと uncaughtException になっていた。
@@ -39,7 +41,9 @@ export default function createSearchWordHandler(
       res.send(JSON.stringify(stmt.all(...strs)));
     } catch (err) {
       sysLogger.error('search-word failed', err);
-      Sentry.captureException(err);
+      // #51: 入力は SQL に影響しない (プレースホルダーは常に 26 個でバインド) ので、
+      // ここに落ちるのは辞書 DB 側の故障だけ。初回から #alerts へ届ける
+      alert('dict-query-failed', err);
       res.status(500).send(JSON.stringify([]));
     }
   };

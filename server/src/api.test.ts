@@ -152,3 +152,11 @@ describe('GET /api/search-word', () => {
     expect(rows).toEqual([]);
   });
 });
+
+describe('GET /api/health', () => {
+  test('UCT-11/N13: 実辞書が健全なら 200 / ok を JSON で返す (SPA フォールバックに飲まれない)', async () => {
+    const res = await get('/api/health');
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.body)).toEqual({ status: 'ok' });
+  });
+});
