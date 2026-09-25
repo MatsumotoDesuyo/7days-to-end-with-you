@@ -34,8 +34,9 @@
 
 - アプリ側の GCP 資源は無い
 - 旧: `tools-475203` の SA `ga-agent-7days@tools-475203.iam.gserviceaccount.com` (GA アカウント `howel` の編集者、JSON 鍵) と
-  `analytics-ro` MCP は my-server#132 で撤去する (読み取りは上の CLI に一本化)。MCP の定義はこの repo から外した。
-  SA・鍵ファイル・gcloud の登録は PO が削除する (手順と記録は my-server#132)
+  `analytics-ro` MCP は my-server#132 で撤去した (**2026-09-26 に撤去済み**。読み取りは上の CLI に一本化)。MCP の定義はこの repo から外した。
+  GA の権限・SA・鍵ファイル・gcloud の登録はすべて削除した (手順と記録は my-server#132)。
+  GCP プロジェクト `tools-475203` は pdf-to-txt (Cloud Vision) が使うので残っているが、7days とは関係しない
 
 ## AdSense
 
