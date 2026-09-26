@@ -17,7 +17,7 @@
       "enabled": false
     },
     {
-      "description": "npm は範囲内の更新 (例: ^19.0.0 のまま 19.3.0 が出た) でも package.json の範囲を上げ、lockfile と一緒に PR にする。既定 (auto) では範囲内の更新が PR にならず、npm の minor/patch のまとめ PR が一度も作られなかった (#49)。rangeStrategy は更新の種類を決める前に使われるので、matchUpdateTypes と同じルールには置かない",
+      "description": "npm は範囲内の更新 (例: ^19.0.0 のまま 19.3.0 が出た) でも package.json の範囲を上げ、lockfile と一緒に PR にする。既定 (auto) では範囲内の更新が PR にならず、npm の minor/patch のまとめ PR が一度も作られなかった (#49)。rangeStrategy は更新の種類を決める前に使われるので、matchUpdateTypes と同じルールには置かない。lockfile で選ばれる版 (推移的な依存を含む) の 7 日の待ちは、Renovate ではなく .npmrc の min-release-age で効かせる",
       "matchManagers": ["npm"],
       "rangeStrategy": "bump"
     },
