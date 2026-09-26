@@ -17,7 +17,7 @@
       "enabled": false
     },
     {
-      "description": "npm は範囲内の更新 (例: ^19.0.0 のまま 19.3.0 が出た) でも package.json の範囲を上げ、lockfile と一緒に PR にする。既定 (auto) では範囲内の更新が PR にならず、npm の minor/patch のまとめ PR が一度も作られなかった (#49)。rangeStrategy は更新の種類を決める前に使われるので、matchUpdateTypes と同じルールには置かない。lockfile を作るときは、Renovate が minimumReleaseAge から npm install --before を付けるので、推移的な依存にも 7 日の待ちが効く (Renovate 44 以降)",
+      "description": "npm は範囲内の更新 (例: ^19.0.0 のまま 19.3.0 が出た) でも package.json の範囲を上げ、lockfile と一緒に PR にする。既定 (auto) では範囲内の更新が PR にならず、npm の minor/patch のまとめ PR が一度も作られなかった (#49)。rangeStrategy は更新の種類を決める前に使われるので、matchUpdateTypes と同じルールには置かない。lockfile を作るときは、Renovate が minimumReleaseAge から npm install --before を付けるので、推移的な依存にも 7 日の待ちが効く (renovatebot/renovate#42552、2026-05 に入った機能)",
       "matchManagers": ["npm"],
       "rangeStrategy": "bump"
     },
