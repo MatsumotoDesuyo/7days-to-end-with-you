@@ -17,6 +17,11 @@
       "enabled": false
     },
     {
+      "description": "npm は範囲内の更新 (例: ^19.0.0 のまま 19.3.0 が出た) でも package.json の範囲を上げ、lockfile と一緒に PR にする。既定 (auto) では範囲内の更新が PR にならず、npm の minor/patch のまとめ PR が一度も作られなかった (#49)。rangeStrategy は更新の種類を決める前に使われるので、matchUpdateTypes と同じルールには置かない",
+      "matchManagers": ["npm"],
+      "rangeStrategy": "bump"
+    },
+    {
       "description": "npm の minor/patch は週 1 でまとめて 1 PR に。将来の自動 merge の対象 (my-server ADR 0015 決定 8)",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
