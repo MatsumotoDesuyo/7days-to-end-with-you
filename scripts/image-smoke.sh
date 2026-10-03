@@ -44,9 +44,56 @@ expect() {
 
 echo '===== docker build ====='
 docker build -t "$TAG" . >/dev/null
+echo "image node: $(docker run --rm "$TAG" node --version)"
 docker rm -f "$NAME" >/dev/null 2>&1 || true
 trap cleanup EXIT
-docker run -d --name "$NAME" -p "$PORT:5001" "$TAG" >/dev/null
+# [使い捨て。merge しない] Sentry の本物の init を確かめる。宛先は runner の 127.0.0.1 の受け口だけで、外へは送らない (#49 の 5972451352 §4)
+RECV_PORT=18080
+RECV_LOG=/tmp/sentry-recv.log
+python3 - "$RECV_PORT" >"$RECV_LOG" 2>&1 <<'PY' &
+import sys, json, gzip, http.server
+port = int(sys.argv[1])
+class H(http.server.BaseHTTPRequestHandler):
+    def _body(self):
+        if 'chunked' in (self.headers.get('Transfer-Encoding') or '').lower():
+            data = b''
+            while True:
+                size = int(self.rfile.readline().split(b';')[0].strip() or b'0', 16)
+                if size == 0:
+                    self.rfile.readline(); break
+                data += self.rfile.read(size); self.rfile.readline()
+        else:
+            data = self.rfile.read(int(self.headers.get('Content-Length') or 0))
+        if (self.headers.get('Content-Encoding') or '').lower() == 'gzip':
+            data = gzip.decompress(data)
+        return data
+    def do_POST(self):
+        lines = self._body().split(b'\n')
+        print(f"ENVELOPE path={self.path}", flush=True)
+        i = 1
+        while i < len(lines):
+            try:
+                ih = json.loads(lines[i])
+            except Exception:
+                i += 1; continue
+            name = ''
+            if ih.get('type') in ('transaction', 'event') and i + 1 < len(lines):
+                try:
+                    name = json.loads(lines[i + 1]).get('transaction') or ''
+                except Exception:
+                    pass
+            print(f"ITEM type={ih.get('type')} transaction={name}", flush=True)
+            i += 2
+        self.send_response(200); self.send_header('Content-Type', 'application/json'); self.end_headers(); self.wfile.write(b'{}')
+    def log_message(self, *a):
+        pass
+http.server.HTTPServer(('127.0.0.1', port), H).serve_forever()
+PY
+RECV_PID=$!
+sleep 1
+docker run -d --name "$NAME" --network host -e PORT="$PORT" \
+  -e SENTRY_DSN="http://public@127.0.0.1:$RECV_PORT/1" -e SENTRY_ENVIRONMENT=smoke -e SENTRY_RELEASE=smoke-61 \
+  "$TAG" >/dev/null
 
 # 起動待ち (最大 30 秒)
 for _ in $(seq 1 30); do
@@ -70,6 +117,17 @@ echo '===== GET /api/health (全辞書, N13) ====='
 body=$(fetch "/api/health") || { echo "NG: GET /api/health failed (not 200): $(curl -sS -m 10 "$BASE/api/health" 2>&1 || true)"; exit 1; }
 expect "$body" '"status":"ok"' 'health 200 (all dictionaries)'
 
+echo '===== [使い捨て] Sentry: 受け口に届いた envelope ====='
+fetch "/api/health" >/dev/null; fetch "/api/health" >/dev/null
+sleep 8
+cat "$RECV_LOG"
+search_tx=$(grep -c 'type=transaction transaction=.*/api/search-word' "$RECV_LOG" || true)
+health_tx=$(grep -c 'type=transaction transaction=.*/api/health' "$RECV_LOG" || true)
+echo "transactions: /api/search-word=$search_tx /api/health=$health_tx"
+[ "$search_tx" -ge 1 ] || { echo 'NG: /api/search-word の transaction が届かない (SDK が送れていない)'; exit 1; }
+[ "$health_tx" -eq 0 ] || { echo 'NG: /api/health の transaction が届いた (tracesSampler が効いていない)'; exit 1; }
+echo 'OK: Sentry init (search-word の transaction あり、health の transaction なし)'
+
 echo '===== SIGTERM graceful shutdown ====='
 docker stop -t 10 "$NAME" >/dev/null
 exit_code=$(docker inspect "$NAME" --format '{{.State.ExitCode}}')
@@ -79,4 +137,5 @@ if [ "$exit_code" != "0" ]; then
 fi
 echo 'OK: graceful exit (code 0)'
 
+kill "$RECV_PID" 2>/dev/null || true
 echo 'ALL_SMOKE_PASSED'
