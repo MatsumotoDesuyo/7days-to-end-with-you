@@ -4,7 +4,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   REGISTRY,
+  combinedMinimumReleaseAge,
   evaluate,
+  expectedTarball,
   exemptionReason,
   isOldEnough,
   minimumReleaseAgeFrom,
@@ -33,6 +35,30 @@ test('minimumReleaseAge の読み方 (Renovate の "7 days" と同じ値)', () =
   assert.equal(minimumReleaseAgeFrom({}).ms, null);
   assert.equal(minimumReleaseAgeFrom({ minimumReleaseAge: 'soon' }).ms, null);
   assert.equal(minimumReleaseAgeFrom({ minimumReleaseAge: '7 days', packageRules: [{ minimumReleaseAge: 'x' }] }).ms, null);
+});
+
+test('閾値は base と head の renovate.json の長い方 (M6: PR の中で縮めても緩まない)', () => {
+  const base = { label: 'base', config: { minimumReleaseAge: '7 days' } };
+  // head で 0 日に縮めても、base の 7 日が使われる
+  assert.equal(combinedMinimumReleaseAge([{ label: 'head', config: { minimumReleaseAge: '0 days' } }, base]).ms, 7 * DAY);
+  // head で長くすれば、head の値
+  assert.equal(combinedMinimumReleaseAge([{ label: 'head', config: { minimumReleaseAge: '14 days' } }, base]).ms, 14 * DAY);
+  // どれか 1 つでも読めなければ赤
+  assert.equal(combinedMinimumReleaseAge([{ label: 'head', config: null }, base]).ms, null);
+  assert.equal(combinedMinimumReleaseAge([{ label: 'head', config: { minimumReleaseAge: '7 days' } }, { label: 'base', config: {} }]).ms, null);
+  assert.equal(combinedMinimumReleaseAge([]).ms, null);
+  // M6 の通し: 若い版 + head の "0 days" は、base の 7 日で YOUNG になる
+  const now = Date.parse('2026-10-04T00:00:00Z');
+  const { ms } = combinedMinimumReleaseAge([{ label: 'head', config: { minimumReleaseAge: '0 days' } }, base]);
+  const r = evaluate({
+    versions: [{ name: 'young', version: '2.0.0', resolved: tgz('young', '2.0.0') }],
+    timesByName: new Map([['young', { time: { '2.0.0': new Date(now - 2 * DAY).toISOString() } }]]),
+    nowMs: now,
+    minAgeMs: ms,
+    exemption: null,
+  });
+  assert.equal(r.ok, false);
+  assert.equal(r.rows[0].status, 'YOUNG');
 });
 
 test('lock の key から名前を取る (scoped・入れ子・別名)', () => {
@@ -107,11 +133,28 @@ test('脆弱性の修正の印 (Renovate の既定の vulnerabilityAlerts と同
   assert.equal(exemptionReason({ eventName: '', commitMessage: '' }), null);
 });
 
-test('取得先は registry.npmjs.org だけ', () => {
-  assert.equal(registryProblem(tgz('a', '1.0.0')), null);
-  assert.match(registryProblem('git+https://github.com/x/y.git#abc'), /registry/);
-  assert.match(registryProblem(undefined), /registry/);
-  assert.match(registryProblem('https://registry.npmjs.org.evil.example/a/-/a-1.0.0.tgz'), /registry/);
+test('resolved は、その名前@版の registry の tarball そのもの (M5: 名前@版と中身の食い違いは赤)', () => {
+  assert.equal(expectedTarball('a', '1.0.0'), `${REGISTRY}/a/-/a-1.0.0.tgz`);
+  assert.equal(expectedTarball('@s/b', '2.0.0'), `${REGISTRY}/@s/b/-/b-2.0.0.tgz`);
+  assert.equal(registryProblem(tgz('a', '1.0.0'), 'a', '1.0.0'), null);
+  assert.equal(registryProblem(`${REGISTRY}/@s/b/-/b-2.0.0.tgz`, '@s/b', '2.0.0'), null);
+  // 取得先が違う
+  assert.match(registryProblem('git+https://github.com/x/y.git#abc', 'a', '1.0.0'), /registry/);
+  assert.match(registryProblem(undefined, 'a', '1.0.0'), /registry/);
+  assert.match(registryProblem('https://registry.npmjs.org.evil.example/a/-/a-1.0.0.tgz', 'a', '1.0.0'), /registry/);
+  // M5: 名前@版は古いまま、resolved だけ別の版 (若い tarball) や別の名前
+  assert.match(registryProblem(tgz('lodash', '4.17.99'), 'lodash', '4.17.21'), /合わない/);
+  assert.match(registryProblem(tgz('evil', '4.17.21'), 'lodash', '4.17.21'), /合わない/);
+  const now = Date.parse('2026-10-04T00:00:00Z');
+  const r = evaluate({
+    versions: [{ name: 'lodash', version: '4.17.21', resolved: tgz('lodash', '4.17.99') }],
+    timesByName: new Map([['lodash', { time: { '4.17.21': new Date(now - 900 * DAY).toISOString() } }]]),
+    nowMs: now,
+    minAgeMs: 7 * DAY,
+    exemption: null,
+  });
+  assert.equal(r.ok, false);
+  assert.equal(r.rows[0].status, 'ERROR');
 });
 
 test('境ちょうどは合格、1 ms 足りなければ不合格', () => {

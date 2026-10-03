@@ -20,7 +20,7 @@
 | イメージのスモーク | 本番のイメージ（ルートの `Dockerfile`）を build して起動し、SPA・SPA のフォールバック・実辞書（RQH → one）・`GET /api/health`（N13）・SIGTERM での graceful shutdown を外から確かめる | Docker（[scripts/image-smoke.sh](../scripts/image-smoke.sh)） |
 
 いずれも CI（[node.js.yml](../.github/workflows/node.js.yml)）で実行される。UCT と UT は job `test`（Node 22）でモノレポ全体として、イメージのスモークは job `image-smoke` で、PR と main への push のたびに動く（#49）。
-あわせて job `release-age`（[scripts/release-age.mjs](../scripts/release-age.mjs)）が、`package-lock.json` に新しく入る版が公開から `renovate.json` の `minimumReleaseAge` 以上かを確かめる（アプリのテストではなく依存の門。脆弱性の修正の branch は除く。#49）。
+あわせて job `release-age`（[scripts/release-age.mjs](../scripts/release-age.mjs)）が、`package-lock.json` に新しく入る版が公開から `renovate.json` の `minimumReleaseAge` 以上かを確かめる（アプリのテストではなく依存の門。脆弱性の修正の branch は除く。#49）。見るのは新しく入る名前@版だけで、同じ名前@版のまま `resolved`・`integrity` だけが変わる行は数えない（lock の差分のレビューが受け持つ）。
 
 ## 2. ユースケーステスト
 

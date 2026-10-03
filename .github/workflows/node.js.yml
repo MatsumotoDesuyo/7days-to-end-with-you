@@ -39,7 +39,8 @@ jobs:
   # lock に新しく入る版が、公開から renovate.json の minimumReleaseAge 以上かを確かめる (#49。脆弱性の修正の branch は除く)。
   # Renovate が npm install --before を外した PR (Artifact update notice) が、待ちを経ずに自動 merge されないように。
   # job の id はルールセットの必須のチェックに名指すので変えない。needs・パスの絞り込み・if で飛ばさない。
-  # registry に届かないと赤になる (安全な側)。外因なら re-run で直し、門を緩めない
+  # registry に届かないと赤になる (安全な側)。外因なら re-run で直す。7 日に満たずに赤になった Renovate の PR は、lock が変わらないと
+  # CI が回り直さない (赤が残って自動 merge が止まったまま) ので、7 日を過ぎた後に re-run で直す。どちらも門を緩めない
   release-age:
     runs-on: ubuntu-latest
     timeout-minutes: 10
