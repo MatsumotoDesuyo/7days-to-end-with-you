@@ -36,6 +36,7 @@ jobs:
         run: bash scripts/image-smoke.sh
 
   # [使い捨て。merge しない] renovate.json を Renovate の validator で確かめる (#49 段階 3b。手元で Renovate を動かさない)
+  # 引数にファイルを渡すと global config として読まれるので、renovate.json のある directory で引数なしに動かす (repository config として読む)
   tmp-renovate-validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -45,19 +46,24 @@ jobs:
           fetch-depth: 2
       - uses: actions/setup-node@v7
         with:
-          node-version: 22.x
-      - name: Install the validator (Renovate 44.125.1, the hosted version that created #61)
-        run: npm install --no-save --prefix /tmp/rv renovate@44.125.1 >/dev/null && /tmp/rv/node_modules/.bin/renovate-config-validator --help | head -5 || true
-      - name: Validate this branch's renovate.json (--strict)
-        run: /tmp/rv/node_modules/.bin/renovate-config-validator --strict renovate.json
+          node-version: 24.x
+      - name: Install the validator (Renovate 44.125.1, the hosted version that created #61. engines node ^24.11.0)
+        run: |
+          node --version
+          npm install --no-save --prefix /tmp/rv renovate@44.125.1 >/dev/null
+          echo "renovate $(node -p "require('/tmp/rv/node_modules/renovate/package.json').version")"
+      - name: Validate this branch's renovate.json as repository config (--strict)
+        run: /tmp/rv/node_modules/.bin/renovate-config-validator --strict
       - name: Validate main's renovate.json as the baseline (--strict)
         run: |
-          git show HEAD^1:renovate.json > /tmp/main-renovate.json
-          /tmp/rv/node_modules/.bin/renovate-config-validator --strict /tmp/main-renovate.json
-      - name: A deliberately wrong config must be rejected
+          mkdir -p /tmp/main && git show HEAD^1:renovate.json > /tmp/main/renovate.json
+          cd /tmp/main && /tmp/rv/node_modules/.bin/renovate-config-validator --strict
+      - name: Deliberately wrong configs must be rejected
         run: |
-          jq '(.packageRules[] | select(.groupName == "npm minor-and-patch") | .automergeSchedule) = ["after 9am and befor 9pm on saturday"]' renovate.json > /tmp/bad-schedule.json
-          jq '(.packageRules[] | select(.groupName == "npm minor-and-patch")) += {"automergeShedule": ["after 9am on saturday"]}' renovate.json > /tmp/bad-key.json
-          for f in /tmp/bad-schedule.json /tmp/bad-key.json; do
-            if /tmp/rv/node_modules/.bin/renovate-config-validator --strict "$f"; then echo "NG: $f passed"; exit 1; else echo "OK: $f rejected"; fi
+          mkdir -p /tmp/bad-schedule /tmp/bad-key /tmp/bad-type
+          jq '(.packageRules[] | select(.groupName == "npm minor-and-patch") | .automergeSchedule) = ["sometime on blursday"]' renovate.json > /tmp/bad-schedule/renovate.json
+          jq '(.packageRules[] | select(.groupName == "npm minor-and-patch")) += {"automergeShedule": ["after 9am on saturday"]}' renovate.json > /tmp/bad-key/renovate.json
+          jq '(.packageRules[] | select(.groupName == "npm minor-and-patch") | .automerge) = "yes"' renovate.json > /tmp/bad-type/renovate.json
+          for d in /tmp/bad-schedule /tmp/bad-key /tmp/bad-type; do
+            if (cd "$d" && /tmp/rv/node_modules/.bin/renovate-config-validator --strict); then echo "NG: $d passed"; exit 1; else echo "OK: $d rejected"; fi
           done
