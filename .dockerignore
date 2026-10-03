@@ -9,3 +9,4 @@ server/logs
 Dockerfile
 .dockerignore
 .github
+server/dict
