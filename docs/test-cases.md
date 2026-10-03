@@ -17,8 +17,9 @@
 |---|---|---|
 | ユースケーステスト (UCT) | ユーザーから見たフロー。UI 操作や API 呼び出しを通す | client: Vitest + @testing-library/react (jsdom) / server: 実サーバー + 実辞書へのブラックボックス HTTP |
 | ユニットテスト (UT) | 個別機能の入出力 | Vitest |
+| イメージのスモーク | 本番のイメージ（ルートの `Dockerfile`）を build して起動し、SPA・SPA のフォールバック・実辞書（RQH → one）・`GET /api/health`（N13）・SIGTERM での graceful shutdown を外から確かめる | Docker（[scripts/image-smoke.sh](../scripts/image-smoke.sh)） |
 
-いずれも CI（Node 22、[node.js.yml](../.github/workflows/node.js.yml)）でモノレポ全体として実行される。
+いずれも CI（[node.js.yml](../.github/workflows/node.js.yml)）で実行される。UCT と UT は job `test`（Node 22）でモノレポ全体として、イメージのスモークは job `image-smoke` で、PR と main への push のたびに動く（#49）。
 
 ## 2. ユースケーステスト
 

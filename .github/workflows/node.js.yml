@@ -1,4 +1,5 @@
 # モノレポ全体を本番ランタイムと同じ Node 22 で lint / build / test する。
+# あわせて本番のイメージ (ルートの Dockerfile) を build して起動し、外から確かめる (job image-smoke、#49)。
 name: Node.js CI
 
 on:
@@ -22,3 +23,14 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
+
+  # 本番のイメージを build し、scripts/image-smoke.sh で SPA・実辞書・health・graceful shutdown を確かめる (#49 段階 3a)。
+  # job の id はルールセットの必須のチェックに名指すので変えない。test と並べて走らせ、needs・パスの絞り込み・if で飛ばさない
+  # (前の job が落ちて skipped になると、必須のチェックで合格に数えられうるため)
+  image-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the production image and run the smoke test
+        run: bash scripts/image-smoke.sh
