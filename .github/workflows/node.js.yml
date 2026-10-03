@@ -1,5 +1,6 @@
 # モノレポ全体を本番ランタイムと同じ Node 22 で lint / build / test する。
 # あわせて本番のイメージ (ルートの Dockerfile) を build して起動し、外から確かめる (job image-smoke、#49)。
+# lock に新しく入る版の公開からの日数も確かめる (job release-age、#49)。
 name: Node.js CI
 
 on:
@@ -34,3 +35,25 @@ jobs:
       - uses: actions/checkout@v7
       - name: Build the production image and run the smoke test
         run: bash scripts/image-smoke.sh
+
+  # lock に新しく入る版が、公開から renovate.json の minimumReleaseAge 以上かを確かめる (#49。脆弱性の修正の branch は除く)。
+  # Renovate が npm install --before を外した PR (Artifact update notice) が、待ちを経ずに自動 merge されないように。
+  # job の id はルールセットの必須のチェックに名指すので変えない。needs・パスの絞り込み・if で飛ばさない。
+  # registry に届かないと赤になる (安全な側)。外因なら re-run で直し、門を緩めない
+  release-age:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.x
+      - name: Self-test of the release-age script
+        run: node --test scripts/release-age.test.mjs
+      - name: Check the release age of versions newly added to package-lock.json
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: node scripts/release-age.mjs
