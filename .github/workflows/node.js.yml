@@ -58,12 +58,49 @@ jobs:
         run: |
           mkdir -p /tmp/main && git show HEAD^1:renovate.json > /tmp/main/renovate.json
           cd /tmp/main && /tmp/rv/node_modules/.bin/renovate-config-validator --strict
-      - name: Deliberately wrong configs must be rejected
+      - name: Deliberately wrong configs must be rejected (key typo, wrong type)
         run: |
-          mkdir -p /tmp/bad-schedule /tmp/bad-key /tmp/bad-type
-          jq '(.packageRules[] | select(.groupName == "npm minor-and-patch") | .automergeSchedule) = ["sometime on blursday"]' renovate.json > /tmp/bad-schedule/renovate.json
+          mkdir -p /tmp/bad-key /tmp/bad-type
           jq '(.packageRules[] | select(.groupName == "npm minor-and-patch")) += {"automergeShedule": ["after 9am on saturday"]}' renovate.json > /tmp/bad-key/renovate.json
           jq '(.packageRules[] | select(.groupName == "npm minor-and-patch") | .automerge) = "yes"' renovate.json > /tmp/bad-type/renovate.json
-          for d in /tmp/bad-schedule /tmp/bad-key /tmp/bad-type; do
-            if (cd "$d" && /tmp/rv/node_modules/.bin/renovate-config-validator --strict); then echo "NG: $d passed"; exit 1; else echo "OK: $d rejected"; fi
+          rc=0
+          for d in /tmp/bad-key /tmp/bad-type; do
+            if (cd "$d" && /tmp/rv/node_modules/.bin/renovate-config-validator --strict); then echo "NG: $d passed"; rc=1; else echo "OK: $d rejected"; fi
           done
+          exit $rc
+      - name: The validator does not check automergeSchedule (record it)
+        run: |
+          mkdir -p /tmp/bad-schedule
+          jq '(.packageRules[] | select(.groupName == "npm minor-and-patch") | .automergeSchedule) = ["sometime on blursday"]' renovate.json > /tmp/bad-schedule/renovate.json
+          if (cd /tmp/bad-schedule && /tmp/rv/node_modules/.bin/renovate-config-validator --strict); then echo "NOTE: an invalid automergeSchedule passes the validator"; else echo "NOTE: the validator rejected an invalid automergeSchedule"; fi
+      - name: Check the schedules with Renovate's own hasValidSchedule / isScheduledNow at fixed times (Asia/Tokyo)
+        run: |
+          ls /tmp/rv/node_modules/renovate/dist/workers/repository/update/branch/schedule.js
+          cat > /tmp/rv/sched-check.mjs <<'JS'
+          import { readFileSync } from 'node:fs';
+          import { Settings } from 'luxon';
+          const { hasValidSchedule, isScheduledNow } = await import('./node_modules/renovate/dist/workers/repository/update/branch/schedule.js');
+          const cfg = JSON.parse(readFileSync(process.argv[2], 'utf8'));
+          const rule = cfg.packageRules.find((r) => r.groupName === 'npm minor-and-patch');
+          const tz = 'Asia/Tokyo';
+          console.log('automergeSchedule', JSON.stringify(rule.automergeSchedule), 'hasValidSchedule', JSON.stringify(hasValidSchedule(rule.automergeSchedule)));
+          console.log('schedule', JSON.stringify(cfg.schedule), 'hasValidSchedule', JSON.stringify(hasValidSchedule(cfg.schedule)));
+          console.log('invalid sample', 'hasValidSchedule', JSON.stringify(hasValidSchedule(['sometime on blursday'])));
+          let ok = hasValidSchedule(rule.automergeSchedule)[0] === true && hasValidSchedule(cfg.schedule)[0] === true;
+          const check = (key, value, iso, want) => {
+            Settings.now = () => Date.parse(iso);
+            const got = isScheduledNow({ [key]: value, timezone: tz }, key);
+            console.log(`${got === want ? 'OK' : 'NG'} ${key} ${iso} -> ${got} (want ${want})`);
+            if (got !== want) ok = false;
+          };
+          for (const [iso, want] of [
+            ['2026-10-10T08:59:00+09:00', false], ['2026-10-10T09:00:00+09:00', true], ['2026-10-10T13:00:00+09:00', true],
+            ['2026-10-10T20:59:00+09:00', true], ['2026-10-10T21:00:00+09:00', false], ['2026-10-10T06:00:00+09:00', false],
+            ['2026-10-09T13:00:00+09:00', false], ['2026-10-11T13:00:00+09:00', false],
+          ]) check('automergeSchedule', rule.automergeSchedule, iso, want);
+          for (const [iso, want] of [
+            ['2026-10-10T06:59:00+09:00', true], ['2026-10-10T07:00:00+09:00', false], ['2026-10-09T23:00:00+09:00', false],
+          ]) check('schedule', cfg.schedule, iso, want);
+          process.exit(ok ? 0 : 1);
+          JS
+          cd /tmp/rv && node sched-check.mjs "$GITHUB_WORKSPACE/renovate.json"
