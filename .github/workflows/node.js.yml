@@ -56,4 +56,4 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           HEAD_REF: ${{ github.head_ref }}
-        run: node scripts/release-age.mjs
+        run: node scripts/release-age.mjs --all
