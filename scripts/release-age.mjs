@@ -256,7 +256,7 @@ async function main(argv) {
   }
 
   const names = [...new Set(versions.filter((v) => !registryProblem(v.resolved)).map((v) => v.name))];
-  const timesByName = await fetchTimes('https://registry.invalid', names);
+  const timesByName = await fetchTimes(REGISTRY, names);
   const nowMs = Date.now();
   const { rows, ok, failed } = evaluate({ versions, timesByName, nowMs, minAgeMs, exemption });
 
