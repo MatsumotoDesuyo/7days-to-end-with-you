@@ -21,5 +21,5 @@ npm run dev:client   # localhost:3000 (/api は 5001 へプロキシ)
 
 ## デプロイ
 
-push で CI（lint / build / test）が回り、ルートの `Dockerfile` から client 焼き込み済みの単一イメージが GHCR へ push される。
+push で CI（lint / build / test と、本番イメージの起動のスモーク）が回り、ルートの `Dockerfile` から client 焼き込み済みの単一イメージが GHCR へ push される。
 運用の責任分担は [DEPLOYMENT.md](DEPLOYMENT.md)（platform 管理・編集禁止）を参照。
