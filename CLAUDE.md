@@ -29,7 +29,7 @@
 ## 検証の流儀 (重要)
 
 - ローカル実機 (Windows) では検証せず、**CI と同じ Linux + Node 22 の Docker コンテナで検証**する
-- 依存更新など挙動リスクのある変更は、push 前に `bash scripts/image-smoke.sh` で本番イメージの起動 E2E (SPA 配信・実辞書ヒット・graceful shutdown) も確認する
+- 依存更新など挙動リスクのある変更は、push 前に `bash .github/scripts/image-smoke.sh` で本番イメージの起動 E2E (SPA 配信・実辞書ヒット・graceful shutdown) も確認する
 - 挙動を変更する PR は use-cases.md → test-cases.md → テスト → 実装の順で同時更新する
 - 仕様かバグか曖昧な挙動は勝手に直さない。ユーザーの判断を仰ぐ
 - 合格ライン: push → CI 緑 (lint + build + テスト) → GHCR イメージ自動更新
@@ -37,6 +37,6 @@
 ## 実行時契約 (アプリ側)
 
 - ポート: 環境変数 `PORT` (デフォルト 5001) / ログ: stdout のみ / SIGTERM・SIGINT で graceful shutdown
-- エラーは Sentry へ emit (#14)。`SENTRY_DSN` / `SENTRY_ENVIRONMENT` / `SENTRY_RELEASE` は platform が注入し、未設定時 (ローカル・CI) は無効。参照は sentry-ro MCP (org: howel, project: 7days-server)
+- エラーは Sentry へ emit (#14)。`SENTRY_DSN` / `SENTRY_ENVIRONMENT` / `SENTRY_RELEASE` は platform が注入し、未設定時 (ローカル・CI) は無効。参照は sentry-ro MCP (org: watashihamatsumotodesu, project: 7days-server)
 - 障害調査・エラー確認は、人に telemetry を貼ってもらう前に **sentry-ro (errors) / grafana-ro (logs・metrics) の MCP でまず自律的に行う** (DEPLOYMENT.md「可視性」)。日常エラーは Discord に通知されないため能動確認が前提
 - 運用への要望・契約変更はこのリポジトリの Issue に起票する

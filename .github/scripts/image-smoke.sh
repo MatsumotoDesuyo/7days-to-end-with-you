@@ -7,10 +7,10 @@
 #      GET /api/health が全辞書の照会を通して 200 を返す (N13 / #51)
 #   3. SIGTERM で graceful shutdown する (exit code 0)
 # を確認する。CI (.github/workflows/node.js.yml の job `image-smoke`) が PR と main への push のたびに動かす (#49)。
-# 手元で動かすときは Docker が動く環境で: bash scripts/image-smoke.sh   (PORT 環境変数で待受ポートを変更可)
+# 手元で動かすときは Docker が動く環境で: bash .github/scripts/image-smoke.sh   (PORT 環境変数で待受ポートを変更可)
 # 失敗したら、コンテナを消す前にコンテナの状態とログを出す (CI のログで原因を読むため)
 set -eo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."  # .github/scripts/ から repo の root へ
 
 TAG=7days-smoke:local
 NAME=7days-smoke
