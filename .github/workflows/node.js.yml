@@ -25,7 +25,7 @@ jobs:
       - run: npm run build
       - run: npm test
 
-  # 本番のイメージを build し、scripts/image-smoke.sh で SPA・実辞書・health・graceful shutdown を確かめる (#49 段階 3a)。
+  # 本番のイメージを build し、.github/scripts/image-smoke.sh で SPA・実辞書・health・graceful shutdown を確かめる (#49 段階 3a)。
   # job の id はルールセットの必須のチェックに名指すので変えない。test と並べて走らせ、needs・パスの絞り込み・if で飛ばさない
   # (前の job が落ちて skipped になると、必須のチェックで合格に数えられうるため)
   image-smoke:
@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Build the production image and run the smoke test
-        run: bash scripts/image-smoke.sh
+        run: bash .github/scripts/image-smoke.sh
 
   # lock に新しく入る版が、公開から renovate.json の minimumReleaseAge 以上かを確かめる (#49。脆弱性の修正の branch は除く)。
   # Renovate が npm install --before を外した PR (Artifact update notice) が、待ちを経ずに自動 merge されないように。
@@ -52,9 +52,9 @@ jobs:
         with:
           node-version: 22.x
       - name: Self-test of the release-age script
-        run: node --test scripts/release-age.test.mjs
+        run: node --test .github/scripts/release-age.test.mjs
       - name: Check the release age of versions newly added to package-lock.json
         env:
           EVENT_NAME: ${{ github.event_name }}
           HEAD_REF: ${{ github.head_ref }}
-        run: node scripts/release-age.mjs
+        run: node .github/scripts/release-age.mjs

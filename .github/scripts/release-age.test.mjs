@@ -1,5 +1,5 @@
-// scripts/release-age.mjs の純粋な部分の self-test (#49)。registry には届かない。
-// 実行: node --test scripts/release-age.test.mjs (CI の job release-age が毎回動かす)
+// .github/scripts/release-age.mjs の純粋な部分の self-test (#49)。registry には届かない。
+// 実行: node --test .github/scripts/release-age.test.mjs (CI の job release-age が毎回動かす)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

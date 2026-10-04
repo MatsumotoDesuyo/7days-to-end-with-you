@@ -20,9 +20,9 @@
 //   PR の run は head の branch が -vulnerability で終わるとき、それ以外の run は HEAD の commit のメッセージで見分ける。
 //   除外のときも確かめは飛ばさず、版と公開からの日数と exempt をログに出す (待ちに満たない版だけを合格に変える)。
 //
-// 使い方: node scripts/release-age.mjs                     (CI。HEAD^1 と HEAD を比べる。EVENT_NAME と HEAD_REF を env で受ける)
-//         node scripts/release-age.mjs --diff <base> <head> (任意の 2 つの rev を比べる)
-//         node scripts/release-age.mjs --all                (head の lock の全部の版を確かめる)
+// 使い方: node .github/scripts/release-age.mjs                     (CI。HEAD^1 と HEAD を比べる。EVENT_NAME と HEAD_REF を env で受ける)
+//         node .github/scripts/release-age.mjs --diff <base> <head> (任意の 2 つの rev を比べる)
+//         node .github/scripts/release-age.mjs --all                (head の lock の全部の版を確かめる)
 // 依存: Node の標準だけ (fetch、child_process、fs)。
 import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
@@ -254,7 +254,7 @@ async function main(argv) {
   } else if (argv[0] === '--diff' && argv.length === 3) {
     [baseRev, headRev] = [argv[1], argv[2]];
   } else if (argv.length > 0) {
-    console.log('usage: node scripts/release-age.mjs [--all | --diff <base> <head>]');
+    console.log('usage: node .github/scripts/release-age.mjs [--all | --diff <base> <head>]');
     return 2;
   }
 
