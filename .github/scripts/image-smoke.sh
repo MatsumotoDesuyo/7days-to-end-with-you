@@ -10,6 +10,7 @@
 # 手元で動かすときは Docker が動く環境で: bash .github/scripts/image-smoke.sh   (PORT 環境変数で待受ポートを変更可)
 # 失敗したら、コンテナを消す前にコンテナの状態とログを出す (CI のログで原因を読むため)
 set -eo pipefail
+echo "NG: ruleset の門の確かめのため、わざと失敗させる (#69。merge しない)"; exit 1
 cd "$(dirname "$0")/../.."  # .github/scripts/ から repo の root へ
 
 TAG=7days-smoke:local
