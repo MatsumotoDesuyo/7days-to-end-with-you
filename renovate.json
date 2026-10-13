@@ -22,10 +22,14 @@
       "rangeStrategy": "bump"
     },
     {
-      "description": "npm の minor/patch は週 1 でまとめて 1 PR に。将来の自動 merge の対象 (my-server ADR 0015 決定 8)",
+      "description": "npm の minor/patch は週 1 でまとめて 1 PR に。CI (test・image-smoke・release-age) がすべて緑なら、土曜 9〜21 時 (JST) に Renovate 自身が merge する (my-server ADR 0015 決定 8、#49 段階 3b)。platformAutomerge を切るのは、GitHub の自動 merge を使うと automergeSchedule が守られないため (Renovate の docs)。CI が外因 (Docker Hub や npm registry の一時の障害など) で赤になったら re-run で直し、門 (このルール、main のルールセット、CI の job) を緩めない",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "npm minor-and-patch"
+      "groupName": "npm minor-and-patch",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "automergeSchedule": ["after 9am and before 9pm on saturday"]
     },
     {
       "description": "GitHub Actions・Dockerfile の minor/patch は npm と別の PR に。自動 merge の対象の外 (人が merge する) なので、npm のまとめに混ぜない",
