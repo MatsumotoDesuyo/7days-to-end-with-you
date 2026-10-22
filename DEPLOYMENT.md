@@ -61,12 +61,12 @@ build と release/run の境界は不変アーティファクトである (Facto
 - アプリはイメージに**不変のタグ**を付けて push する。タグはソースのリビジョン (git SHA) から一意に導かれ、再利用・再 push しない (floating タグ `latest` / `server` は release ではない)。現行の導出形式は `<role>-<shortsha>` (例 `server-3f2a1c9`。role は同一リポジトリから複数イメージを出す場合の区別)。build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
 - platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。health はコンテナの状態 (crash-loop / 停止 / unhealthy) に加え、**アプリが health エンドポイントを宣言していればその HTTP ステータス**で判定する (200 = 成功、それ以外・接続不可・タイムアウト = 失敗。コンテナ判定 (起動 12 秒後) の後、最大 60 秒再試行する。本文は判定に使わない)。宣言は `ops/bin/remote-deploy.sh` の `health_url` に載せる。同じエンドポイントを Grafana Alerting が常時 probe する (`compose/alloy/config.alloy`)。
 - **リリース履歴の正本は platform 側の台帳 (Git)** であり、platform のロールバックはその revert である。
-- **ブランチ運用は GitHub Flow で統一する。** 長命ブランチは `main` だけで、常にデプロイ可能に保つ。作業は `main` から切った短命ブランチで行い、Pull Request で `main` に戻す。`develop` / `release/*` / `hotfix/*` は持たない (バージョン付きのリリース列を持たないため)。platform が release の起点にするのは `main` である: コンテナは `main` からの build が dispatch され、静的サイトは `main` への merge がそのまま本番デプロイになる。platform のロールバックは、台帳の revert か、配信側の版の巻き戻しで行う。アプリの側で戻すときは、`main` への revert の PR で行い、その merge からいつもの build と release が走る。どちらも、ブランチの付け替えでは行わない。
-- **静的サイト (Cloudflare Workers Static Assets) の受け渡し**: アプリは配信ディレクトリと `wrangler.jsonc` を *build* の成果として渡す。`wrangler.jsonc` は**リポジトリ直下**に置く (platform は Workers Builds を既定コマンドで動かし、アプリ固有の引数を持たない。ADR 0014)。`main` への push が本番デプロイで、それ以外のブランチは version のアップロードのみで本番に出ない。**`workers.dev` 系の入口の開閉 (`workers_dev` / `preview_urls`) は platform が決める値で、置き場所が `wrangler.jsonc` でもアプリは変更しない** (ADR 0014 決定 5)。
+- **ブランチ運用は GitHub Flow を基本とし、プロジェクトによっては Git Flow でもよい** (ADR 0060)。GitHub Flow では、長命ブランチは `main` だけで、常にデプロイ可能に保つ。作業は `main` から切った短命ブランチで行い、Pull Request で `main` に戻す。`develop` / `release/*` / `hotfix/*` は持たない。Git Flow では開発とリリースの branch を分け (例: リリースの branch を守るゲーム)、`develop` / `release/*` / `hotfix/*` を持てる。Git Flow にするプロジェクトは、そのことと本番の branch を platform に宣言する。platform が release の起点にするのは本番の branch で、GitHub Flow では `main` である: コンテナは本番の branch からの build が dispatch され、静的サイトは本番の branch への merge がそのまま本番デプロイになる。platform のロールバックは、台帳の revert か、配信側の版の巻き戻しで行う。アプリの側で戻すときは、本番の branch への revert の PR で行い、その merge からいつもの build と release が走る。どちらも、ブランチの付け替えでは行わない。
+- **静的サイト (Cloudflare Workers Static Assets) の受け渡し**: アプリは配信ディレクトリと `wrangler.jsonc` を *build* の成果として渡す。`wrangler.jsonc` は**リポジトリ直下**に置く (platform は Workers Builds を既定コマンドで動かし、アプリ固有の引数を持たない。ADR 0014)。本番の branch (GitHub Flow では `main`) への push が本番デプロイで、それ以外のブランチは本番に出ない (version のアップロードかプレビュー。Worker の設定による)。**`workers.dev` 系の入口の開閉 (`workers_dev` / `preview_urls`) は platform が決める値で、置き場所が `wrangler.jsonc` でもアプリは変更しない** (ADR 0014 決定 5)。
 
 ## 組織 (ドメイン横断の資産)
 
-アプリと platform の他に、**組織** (soncho-works.com の所有者) という第三の役者がいる。
+アプリと platform の他に、**組織** (soncho-works.com と howel.jp の所有者) という第三の役者がいる (ADR 0011、ADR 0060)。
 
 - **組織が所有**: ドメインと命名、メール、SaaS テナント (契約・課金・ログイン)、収益と法務 (AdSense アカウント・pub-ID・root の `ads.txt`・CMP/同意設定・privacy policy)、計測のアカウント (GA4 のアカウント)。
 - **アプリが所有**: その資産を使うか、どこでどう使うか (広告の有無と配置、GA4 のプロパティ/タグ)。組織が発行した ID / スニペットを組み込む。**組織資産の正本をアプリに置かない**。
