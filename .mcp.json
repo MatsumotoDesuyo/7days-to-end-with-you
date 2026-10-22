@@ -4,8 +4,7 @@
       "command": "mcp-grafana",
       "args": ["-t", "stdio", "--disable-write"],
       "env": {
-        "GRAFANA_URL": "https://maroonkinkajou2355.grafana.net",
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_VIEWER_TOKEN}"
+        "GRAFANA_URL": "https://maroonkinkajou2355.grafana.net"
       }
     },
     "sentry-ro": {
