@@ -44,14 +44,15 @@
 - AdSense: Publisher ID `pub-9666515152781934`。root `ads.txt` は組織が正本を持ち、platform が root で配信する。
   参加するアプリは AdSense のスクリプトを組み込むだけ (CMP/同意メッセージは組織のアカウント設定で表示される)。
 - サブドメイン: 命名は組織、レコード作成と証明書は platform。
-- プライバシーポリシー: soncho-works.com と全サブドメインに適用する汎用版を組織が持ち、**https://soncho-works.com/privacy/** で配信する。
-  各アプリはこの URL へリンクする (個別のポリシーを持たない。固有事項があれば「本ポリシーに加えて」の形で補足する)。
-  howel.jp のサイト (trinity-nexus) は、このポリシーの対象の外。ポリシーと連絡先は後で決める (my-server#571)。
-- 公開連絡先: **watashihamatsumotodesu@gmail.com** (プライバシーポリシーの「連絡先」と同じ)。
-  エンドユーザーや権利者に向けて公開する窓口 (フッター、プライバシーの補足、削除要請の受付) には、各アプリがこのアドレスを掲載する。
-  連絡先のメールアドレスはこれに統一し、アプリ独自のアドレスを作らない。X などメール以外の窓口を併記するかは各アプリの判断。
+- プライバシーポリシー: 組織がドメインごとに 1 つずつ持つ。アプリは個別のポリシーを持たない (固有事項があれば「本ポリシーに加えて」の形で補足する)。
+  - soncho-works.com と全サブドメイン: 汎用版を **https://soncho-works.com/privacy/** で配信する。各アプリはこの URL へリンクする。
+  - howel.jp と全サブドメイン: howel.jp 版 (my-server#571)。howel.jp の apex にはサイトが無いので、各サイトが自分の `/privacy/` に写しを持ち (アプリのサイトの静的ファイルの置き場 `public/` の下の `privacy/index.html`。repo の直下とは限らない。platform が正本から PR で届ける。アプリでは編集しない)、そこへリンクする。今は **https://trinity-nexus.howel.jp/privacy/**。
+- 同意 (EEA・英国・スイスの訪問者): soncho-works.com のサイトは、AdSense の同意メッセージ (上の AdSense の項)。howel.jp のサイトは、Google アナリティクスの同意モードで、その地域の既定を拒否にする (Google アナリティクスの Cookie を使わない。同意のバナーは出さない。my-server#571)。この既定をタグに書くのはアプリ。
+- 公開連絡先: エンドユーザーや権利者に向けて公開する窓口 (フッター、プライバシーの補足、削除要請の受付) には、各アプリが自分のドメインの連絡先を掲載する。
+  連絡先はドメインごとに下のものに統一し、アプリ独自の窓口を作らない。X などほかの窓口を併記するかは各アプリの判断。
+  - soncho-works.com のサイト: **watashihamatsumotodesu@gmail.com** (soncho-works.com のポリシーの「連絡先」と同じ)。
+  - howel.jp のサイト: **お問い合わせフォーム** https://docs.google.com/forms/d/e/1FAIpQLSfxd6aqYEXd3UnhXXLf9eWMNsJKsvxx8sudn6PiSIEfnGo2Lg/viewform (howel.jp のポリシーの「連絡先」と同じ。my-server#571)。
   運用の通知先 (エラー通知・証明書・SaaS からのメール) は、この項目では定めない。
-  howel.jp のサイトの連絡先は、上の項のとおり後で決める (my-server#571)。
 
 ## 組織への要望
 
