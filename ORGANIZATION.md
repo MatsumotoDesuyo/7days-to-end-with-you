@@ -23,7 +23,7 @@
 | 7days-to-end-with-you | 7days-to-decode.soncho-works.com | v3 コンテナ + Caddy | `7days-server` | `7days-server` | **あり** (pub-9666515152781934) | GA4 `G-HL1N4FK04L` |
 | map-scan-code | map-scan-code.soncho-works.com | Cloudflare Workers Static Assets | なし | なし (外形監視のみ) | **あり** (pub-9666515152781934、`/` のみ) | GA4 `G-V20P5EBEL7` |
 | soncho-works-site | soncho-works.com (apex) | Cloudflare Workers Static Assets (2026-09-04 に WordPress から移行) | なし | なし (外形監視のみ) | **あり** (root `ads.txt` を配信) | Google タグ `GT-M6XHF7Q` (送り先は GA4 `G-1C9DJ3W5V2`。Google タグのコンテナ `https://www.googletagmanager.com/gtag/js?id=GT-M6XHF7Q` の中身と、受信側の Web ストリームの `defaultUri` の両方で確認 (2026-09-26)。タグの設定は API で読めない)、Search Console 検証あり |
-| trinity-nexus | trinity-nexus.howel.jp | Cloudflare Workers Static Assets (本番の branch は `develop`。2026-10-23 に Cloudflare Pages から移行、my-server の ADR 0068) | なし | なし (外形監視のみ) | なし | 後 (my-server#571) |
+| trinity-nexus | trinity-nexus.howel.jp | Cloudflare Workers Static Assets (本番の branch は `develop`。2026-10-23 に Cloudflare Pages から移行、my-server の ADR 0068) | なし | なし (外形監視のみ) | なし | GA4 `G-2Z7DTHP6Y1` (2026-10-27 から。my-server#571) |
 
 ### 計測の識別子 (読み経路で使う)
 
@@ -33,10 +33,10 @@
 | 7days-to-end-with-you | `G-HL1N4FK04L` | `sc-domain:7days-to-decode.soncho-works.com` |
 | map-scan-code | `G-V20P5EBEL7` | `sc-domain:map-scan-code.soncho-works.com` |
 | soncho-works-site | `G-1C9DJ3W5V2` (Google タグ `GT-M6XHF7Q` 経由。確かめ方は上の表の apex の行) | `sc-domain:soncho-works.com` |
-| trinity-nexus | なし (後。my-server#571) | `sc-domain:trinity-nexus.howel.jp` (platform の読み経路の身元には付けていない。my-server#406) |
+| trinity-nexus | `G-2Z7DTHP6Y1` (読むのは platform だけ。アプリ用の身元は作っていない。my-server#571) | `sc-domain:trinity-nexus.howel.jp` (platform の読み経路の身元には付けていない。my-server#406) |
 
 - Search Console は 5 つともドメイン プロパティ。`sc-domain:soncho-works.com` はサブドメインを含むので、apex だけを見るときはページの URL で読み分ける。
-- GA4 の API に渡すのは数値のプロパティ ID で、測定 ID (`G-…` / `GT-…`) は渡せない。**数値のプロパティ ID はここには載せない** (アプリの運用に要らない。platform の読み経路が使う値で、正本は my-server の `ops/runbooks/google-api-credentials.md`。アプリの AI は `ga4-report.py properties` で引ける。この catalog は各アプリに複製され public にもなるため、アプリの運用に要らない識別子は配らない。PO の決定、2026-09-26)。測定 ID / Google タグはページの HTML で誰でも読める値で、ここに載せても露出は増えない。ただし測定 ID は誰でもヒットを送れる宛先なので、意図しないヒットは権限では防げない (my-server#151)。
+- GA4 の API に渡すのは数値のプロパティ ID で、測定 ID (`G-…` / `GT-…`) は渡せない。**数値のプロパティ ID はここには載せない** (アプリの運用に要らない。platform の読み経路が使う値で、正本は my-server の `ops/runbooks/google-api-credentials.md`。アプリの AI は自分のアプリの身元 (アプリ用の身元) で `ga4-report.py properties` を使って引ける。アプリ用の身元の無いアプリ (trinity-nexus) は、GA4 の値が要るときは `to-platform` の Issue で platform に頼む。この catalog は各アプリに複製され public にもなるため、アプリの運用に要らない識別子は配らない。PO の決定、2026-09-26)。測定 ID / Google タグはページの HTML で誰でも読める値で、ここに載せても露出は増えない。ただし測定 ID は誰でもヒットを送れる宛先なので、意図しないヒットは権限では防げない (my-server#151)。
 - 読み経路 (誰がどの道具で読むか) は契約 (`DEPLOYMENT.md`)「可視性」。GA4 / Search Console の設定の変更や、プロパティの追加は `to-org` で依頼する。
 
 ## 組織が発行・配信するもの
