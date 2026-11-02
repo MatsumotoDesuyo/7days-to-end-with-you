@@ -47,7 +47,7 @@
 - プライバシーポリシー: 組織がドメインごとに 1 つずつ持つ。アプリは個別のポリシーを持たない (固有事項があれば「本ポリシーに加えて」の形で補足する)。
   - soncho-works.com と全サブドメイン: 汎用版を **https://soncho-works.com/privacy/** で配信する。各アプリはこの URL へリンクする。
   - howel.jp と全サブドメイン: howel.jp 版 (my-server#571)。howel.jp の apex にはサイトが無いので、各サイトが自分の `/privacy/` に写しを持ち (アプリのサイトの静的ファイルの置き場 `public/` の下の `privacy/index.html`。repo の直下とは限らない。platform が正本から PR で届ける。アプリでは編集しない)、そこへリンクする。今は **https://trinity-nexus.howel.jp/privacy/**。
-- 同意 (EEA・英国・スイスの訪問者): soncho-works.com のサイトは、AdSense の同意メッセージ (上の AdSense の項)。howel.jp のサイトは、Google アナリティクスの同意モードで、その地域の既定を拒否にする (Google アナリティクスの Cookie を使わない。同意のバナーは出さない。my-server#571)。この既定をタグに書くのはアプリ。
+- 同意 (EEA・英国・スイスの訪問者): soncho-works.com のサイトは、広告は AdSense の同意メッセージ (上の AdSense の項)、Google アナリティクスは同意モードで、その地域の既定を拒否にする (Google アナリティクスの Cookie を使わない。同意メッセージの答えは Google アナリティクスに効かせない。my-server#663)。howel.jp のサイトは、Google アナリティクスの同意モードで、その地域の既定を拒否にする (Google アナリティクスの Cookie を使わない。同意のバナーは出さない。my-server#571)。この既定をタグに書くのはアプリ。
 - 公開連絡先: エンドユーザーや権利者に向けて公開する窓口 (フッター、プライバシーの補足、削除要請の受付) には、各アプリが自分のドメインの連絡先を掲載する。
   連絡先はドメインごとに下のものに統一し、アプリ独自の窓口を作らない。X などほかの窓口を併記するかは各アプリの判断。
   - soncho-works.com のサイト: **watashihamatsumotodesu@gmail.com** (soncho-works.com のポリシーの「連絡先」と同じ)。
