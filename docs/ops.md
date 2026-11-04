@@ -78,11 +78,14 @@
 - 規則の正本は my-server の `ops/ai/renovate-automerge.md` (bot が自分で merge してよい範囲と条件) と
   `ops/ai/dependency-trust.md` (依存を足す・上げるときの物差し)。この節は値の台帳で、規則は写さない
 - 実行: `schedule` `before 7am on saturday` (`:timezone(Asia/Tokyo)`)
-- **自動 merge の範囲**: npm の minor/patch のまとめ PR (`groupName` `npm minor-and-patch`) のルールだけ。
+- **自動 merge の範囲**: npm の minor/patch のルール (まとめの `groupName` `npm minor-and-patch`) だけ。
   `automerge: true` / `automergeType: "pr"` / `platformAutomerge: false` / `automergeSchedule` `after 9am and before 9pm on saturday`。
   GitHub Actions・Dockerfile の minor/patch は別の PR (`actions-and-docker minor-and-patch`) で、自動 merge しない
 - **7 日の待ち**: `minimumReleaseAge` `7 days`。PR では Renovate の check `renovate/stability-days` と、
   CI の job `release-age` (lock に新しく入る版の公開からの日数。`.github/scripts/release-age.mjs`) で見る
+  - 例外は脆弱性の修正 (`renovate.json` の `vulnerabilityAlerts` はラベル `renovate`・`security` を付ける)。`release-age` は、PR では head の branch が
+    `-vulnerability` で終わるとき、それ以外の run では HEAD の commit のメッセージがその branch の merge か `[SECURITY]` を含むとき、待ちに満たない版を合格にする
+    (`release-age.mjs` の `exemptionReason`)。規則の正本は my-server の `ops/ai/renovate-automerge.md`「待ち」(自動 merge の対象は同じ文書の「対象」) と `ops/ai/dependency-trust.md`「版の選び方」
 - メジャー: PR にせず Dependency Dashboard の承認待ちに並ぶ (`dependencyDashboardApproval: true`)。
   Node と `@types/node` のメジャーは無効 (`enabled: false`。上げると決めたらそのルールを消す)
 - **`main` のルールセット** (id `24965959`、`active`): 必須の check は `test`・`image-smoke`・`release-age`
