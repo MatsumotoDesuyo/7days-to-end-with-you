@@ -70,3 +70,37 @@
   root (`https://soncho-works.com/ads.txt`) で配信中。アプリ側の複製
   (client/public/ads.txt) は役目を終えたため削除した。広告システムの追加等で
   行の変更が必要になったら、このリポジトリの Issue に **`to-org`** ラベルで申告する
+
+## 依存の自動更新 (Renovate・`main` のルールセット)
+
+- 仕組み: Renovate (GitHub App) が `renovate.json` の設定で依存の更新の PR を作る。一覧と承認の窓口は Dependency Dashboard (#15)。
+  導入と試行は #49、仕上げは #62 (値は 2026-11-04 に origin/main `14857d6` と GitHub の API で確かめた)
+- 規則の正本は my-server の `ops/ai/renovate-automerge.md` (bot が自分で merge してよい範囲と条件) と
+  `ops/ai/dependency-trust.md` (依存を足す・上げるときの物差し)。この節は値の台帳で、規則は写さない
+- 実行: `schedule` `before 7am on saturday` (`:timezone(Asia/Tokyo)`)
+- **自動 merge の範囲**: npm の minor/patch のルール (まとめの `groupName` `npm minor-and-patch`) だけ。
+  `automerge: true` / `automergeType: "pr"` / `platformAutomerge: false` / `automergeSchedule` `after 9am and before 9pm on saturday`。
+  GitHub Actions・Dockerfile の minor/patch は別の PR (`actions-and-docker minor-and-patch`) で、自動 merge しない
+- **7 日の待ち**: `minimumReleaseAge` `7 days`。PR では Renovate の check `renovate/stability-days` と、
+  CI の job `release-age` (lock に新しく入る版の公開からの日数。`.github/scripts/release-age.mjs`) で見る
+  - 例外は脆弱性の修正 (`renovate.json` の `vulnerabilityAlerts` はラベル `renovate`・`security` を付ける)。`release-age` は、PR では head の branch が
+    `-vulnerability` で終わるとき、それ以外の run では HEAD の commit のメッセージがその branch の merge か `[SECURITY]` を含むとき、待ちに満たない版を合格にする
+    (`release-age.mjs` の `exemptionReason`)。規則の正本は my-server の `ops/ai/renovate-automerge.md`「待ち」(自動 merge の対象は同じ文書の「対象」) と `ops/ai/dependency-trust.md`「版の選び方」
+- メジャー: PR にせず Dependency Dashboard の承認待ちに並ぶ (`dependencyDashboardApproval: true`)。
+  Node と `@types/node` のメジャーは無効 (`enabled: false`。上げると決めたらそのルールを消す)
+- **`main` のルールセット** (id `24965959`、`active`): 必須の check は `test`・`image-smoke`・`release-age`
+  (`.github/workflows/node.js.yml` の job)。素通りの役 (`bypass_actors`) は無い。`renovate/stability-days` は必須に入っていない。
+  作った経緯と承認の記録は #69・#62 §11 (2026-10-13)
+- **壊れたときの守りと戻し**:
+  - PR の CI の `image-smoke` が、本番のイメージを build して起動を確かめる (`.github/scripts/image-smoke.sh`)
+  - deploy の health の判定と直前のタグへの自動の戻し、常時の probe と #alerts への通知は platform の管轄
+    (7days は `/api/health` を宣言済み。#53、DEPLOYMENT.md「リリースの受け渡し」「可視性」)
+  - 動いた後に壊れたら、`main` への revert の PR で戻す (DEPLOYMENT.md「リリースの受け渡し」)
+  - 自動 merge を止めたいときは、`renovate.json` の npm のまとめのルールから `automerge` を外す PR を出す
+    (範囲を狭める向き。承認の形は my-server の `ops/ai/envelope.md` の依存更新の bot の設定の区画)
+- **間接の依存の脆弱性**: 間接の依存だけを上げる PR は作られない (`lockFileMaintenance` を有効にしていない)。
+  Dependabot alerts は有効で、開発用の一部は自動で却下される (`auto_dismissed`)。
+  Dependabot security updates は無効 (2026-11-04 に `gh api repos/MatsumotoDesuyo/7days-to-end-with-you/automated-security-fixes` で `enabled: false`)。
+  件ごとに lock を直した前例は #74・#89。直す仕組みは未定 (MatsumotoDesuyo/my-server#307 で決める)
+- **見張りの Issue**: `gh issue list -R MatsumotoDesuyo/7days-to-end-with-you -l watch`
+  (7days には部品の runbook が無いので `part:` は付けない)
