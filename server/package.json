@@ -11,7 +11,7 @@
     "build": "npm run clean && tsc && cpx -C ejdict.sqlite3 ./dist && cpx -C \"dict/*.sqlite3\" ./dist/dict"
   },
   "dependencies": {
-    "@sentry/node": "^10.76.2",
+    "@sentry/node": "^10.78.0",
     "express": "^5.3.0",
     "log4js": "^6.9.1",
     "shared": "*"
@@ -30,7 +30,7 @@
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.72.0",
+    "typescript-eslint": "^8.72.1",
     "vitest": "^4.1.12"
   }
 }
