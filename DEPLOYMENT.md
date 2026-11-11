@@ -56,7 +56,7 @@ OpenTelemetry を契約言語として定める。個別の判断は列挙せず
 
 ## リリースの受け渡し (build → release)
 
-build と release/run の境界は不変アーティファクトである (Factor V)。アプリは *build* を所有し、生成したアーティファクトの identity を platform に渡す。release と run (どこへ・どう配置するか) は platform が実行し、アプリはそれを知らない・触らない (配置先の知識も、ホストのシェルや書き込みの経路も持たない)。ホストの上の自サービスの分 (コンテナのログと状態、タイマーの結果、内部の API の読み取り) を読む要があるアプリには、platform がアプリ専用の読み取りの利用者を作り、決めたコマンドだけを許す (導出ルールの 2 段の決まりの 1 段目。他のアプリのコンテナ・環境変数・DB・ホストの設定には届かない。手順は my-server の `ops/runbooks/app-host-readers.md`)。
+build と release/run の境界は不変アーティファクトである (Factor V)。アプリは *build* を所有し、生成したアーティファクトの identity を platform に渡す。release と run (どこへ・どう配置するか) は platform が実行し、アプリはそれを知らない・触らない (配置先の知識も、ホストのシェルや書き込みの経路も持たない)。ホストの上の自サービスの分 (コンテナのログと状態、タイマーの結果、内部の API の読み取り、自サービスの DB の読み取り) を読む要があるアプリには、platform がアプリ専用の読み取りの利用者を作り、決めたコマンドだけを許す (導出ルールの 2 段の決まりの 1 段目。他のアプリのコンテナ・環境変数・DB・ホストの設定には届かない。手順は my-server の `ops/runbooks/app-host-readers.md`)。
 
 - アプリはイメージに**不変のタグ**を付けて push する。タグはソースのリビジョン (git SHA) から一意に導かれ、再利用・再 push しない (floating タグ `latest` / `server` は release ではない)。現行の導出形式は `<role>-<shortsha>` (例 `server-3f2a1c9`。role は同一リポジトリから複数イメージを出す場合の区別)。build 成功後に platform へリリース対象 `(service, tag)` を通知する。通知は人格を持たない最小権限・短命の資格情報で行う。
 - platform はそのタグを pin して release / run し、起動後の health 確認と、失敗時の直前タグへのロールバックを担う。health はコンテナの状態 (crash-loop / 停止 / unhealthy) に加え、**アプリが health エンドポイントを宣言していればその HTTP ステータス**で判定する (200 = 成功、それ以外・接続不可・タイムアウト = 失敗。コンテナ判定 (起動 12 秒後) の後、最大 60 秒再試行する。本文は判定に使わない)。宣言は `ops/bin/remote-deploy.sh` の `health_url` に載せる。同じエンドポイントを Grafana Alerting が常時 probe する (`compose/alloy/config.alloy`)。
